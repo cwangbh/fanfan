@@ -159,6 +159,8 @@ Built from the current menu:
   lets you save it to Files → iCloud Drive. **Import** restores from that file. It replaces the household data,
   after you confirm. Settings shows a monthly "back up now" reminder.
 - The server only stores data. All planning runs on the phone.
+- **Lock the server to your household** once it exists: set `FANFAN_HOUSEHOLDS` (see Deploy). The server then refuses
+  every other household ID with 403, so strangers can't store anything on it.
 
 ## Screens
 One page, designed for a phone first, with a bottom tab bar:
@@ -234,6 +236,17 @@ Built-in recipes and ingredients come with the app code. Only your own additions
 - **HTTPS is required:** iPhones only install a PWA and keep its offline cache over HTTPS. Put the container
   behind a reverse proxy with a certificate, for example Caddy (`meals.example.com { reverse_proxy localhost:8080 }`) or Nginx + Let's Encrypt.
 - **Backup:** copy `./data/meals.db` (e.g. a nightly cron job). The iCloud export in R10 is a second backup.
+- **Settings** (environment variables, e.g. in a `docker-compose.override.yml`):
+
+  | Variable | Default | Purpose |
+  |---|---|---|
+  | `FANFAN_HOUSEHOLDS` | *(unset: any ID)* | Comma-separated household IDs the server accepts. Set it right after creating your household. |
+  | `FANFAN_MAX_DB_MB` | `200` | Writes are refused (507) once the database grows past this size. |
+  | `PORT` / `DATA_DIR` / `STATIC_DIR` | `8080` / `./data` / `./dist` | Where to listen, store data and find the built app. |
+
+- **Sharing a server with other apps:** don't publish the port. Put the container on its own Docker network that only
+  your reverse proxy also joins, and give it limits (`mem_limit: 256m`, `cpus: 0.5`, `pids_limit: 128`). Then a problem in
+  Fanfan can't reach your other apps' databases or fill the machine.
 - **Update:** `git pull && docker compose up -d --build`. The data stays in the volume.
 
 ## Acceptance checklist
