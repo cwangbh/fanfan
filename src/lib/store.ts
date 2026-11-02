@@ -147,6 +147,8 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
     ...init,
     headers: { 'Content-Type': 'application/json' },
   })
+  if (res.status === 403) throw new Error('This server is locked to a different household. Check your household link.')
+  if (res.status === 507) throw new Error('The server is out of storage space.')
   if (!res.ok) throw new Error(`Server replied ${res.status}`)
   return res.json() as Promise<T>
 }
