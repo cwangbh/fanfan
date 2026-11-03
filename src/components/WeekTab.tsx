@@ -31,7 +31,9 @@ export function WeekTab({ plan, view, catalog, people, onOpenDish, onSwap, onReg
         </div>
         <div className="tiny muted">
           {KIND_LABELS[d.slot]} · {d.recipe.minutes} min · <span className="her">{d.portion[0]} g</span> / <span className="him">{d.portion[1]} g</span>
-          {d.batch === 2 && ' · cook double'}
+          {d.cookDay !== d.day
+            ? ` · 🍲 cooked Sunday, reheat${d.store === 'freezer' ? ' · ❄️ thaw the night before' : ''}`
+            : d.batch === 2 && ' · cook double'}
         </div>
         {swapping === d.index && (
           <SwapList
@@ -89,7 +91,7 @@ export function WeekTab({ plan, view, catalog, people, onOpenDish, onSwap, onReg
               <h2>{name}</h2>
               <span className="muted small">{date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
               <span className="spacer" />
-              {day === 0 && <span className="badge accent">🛒 Shop & prep</span>}
+              {day === 0 && <span className="badge accent">🛒 Shop, prep & cook ahead</span>}
               {day === 5 && <span className="badge">🥡 Takeout night</span>}
             </div>
 
@@ -128,7 +130,7 @@ export function WeekTab({ plan, view, catalog, people, onOpenDish, onSwap, onReg
             ) : (
               <>
                 {dinner.map(dishRow)}
-                {day <= 4 && <p className="tiny muted" style={{ margin: '4px 0 0' }}>After dinner, pack half of the main and the vegetable dish into {DAY_NAMES[day + 1]}'s lunch boxes.</p>}
+                {day <= 4 && <p className="tiny muted" style={{ margin: '4px 0 0' }}>{dinnerHint(dinner, day)}</p>}
               </>
             )}
 
@@ -149,6 +151,14 @@ export function WeekTab({ plan, view, catalog, people, onOpenDish, onSwap, onReg
       </button>
     </div>
   )
+}
+
+function dinnerHint(dinner: DishView[], day: number): string {
+  const reheat = dinner.filter((d) => d.cookDay !== d.day).map((d) => d.recipe.name)
+  const fresh = dinner.filter((d) => d.cookDay === d.day && d.slot !== 'soup').map((d) => d.recipe.name)
+  const pack = `pack half of the main and the vegetable dish into ${DAY_NAMES[day + 1]}'s lunch boxes.`
+  if (!reheat.length) return `After dinner, ${pack}`
+  return `Reheat ${reheat.join(', ')}. Cook ${fresh.join(', ') || 'the rest'} fresh. After dinner, ${pack}`
 }
 
 function SwapList({ plan, index, catalog, onPick }: { plan: WeekPlan; index: number; catalog: Catalog; onPick: (id: string) => void }) {

@@ -24,7 +24,8 @@ export function PrepTab({ weekStart, view, checks, onCheck }: Props) {
           </span>
         </div>
         <p className="small muted" style={{ marginBottom: 0 }}>
-          Do this right after shopping, before Sunday dinner. It takes about 60–90 minutes.
+          Do this right after shopping. Start the longest cook-ahead dish first, then portion and store the rest while it
+          simmers. It takes about 2½–3 hours, and Mon–Thu dinners become reheat + one quick vegetable dish.
         </p>
       </div>
 

@@ -26,15 +26,17 @@ The week runs **Sunday → Saturday** and starts with the shop.
 
 | Day | Lunch | Dinner |
 |---|---|---|
-| **Sun** | Not planned | 🛒 Shop + prep, then a **full dinner**, cooked with extra for Monday's lunch boxes |
-| **Mon** | 🍱 Lunch boxes, eaten separately | Full dinner + extra for Tuesday's boxes |
-| **Tue** | 🍱 Lunch boxes | Full dinner + extra for Wednesday's boxes |
-| **Wed** | 🍱 Lunch boxes | Full dinner + extra for Thursday's boxes |
-| **Thu** | 🍱 Lunch boxes | Full dinner + extra for Friday's boxes |
+| **Sun** | Not planned | 🛒 Shop + prep + 🍲 **cook the Mon–Thu meat mains**, then a **full dinner**, cooked with extra for Monday's lunch boxes |
+| **Mon** | 🍱 Lunch boxes, eaten separately | Reheat Sunday's main + cook a quick veg dish, extra for Tuesday's boxes |
+| **Tue** | 🍱 Lunch boxes | Reheat + quick veg dish, extra for Wednesday's boxes |
+| **Wed** | 🍱 Lunch boxes | Reheat (thawed) + quick veg dish, extra for Thursday's boxes |
+| **Thu** | 🍱 Lunch boxes | Reheat (thawed) + quick veg dish, extra for Friday's boxes |
 | **Fri** | 🍱 Lunch boxes | 🥡 Takeout (not planned) |
 | **Sat** | One-pot lunch (fried rice, noodles, and so on) | **Full dinner**, single batch, no boxes needed |
 
-- 5 double-batch cooking nights (Sun–Thu) cover 5 dinners and 5 weekday lunches for each person.
+- 5 double-batch dinners (Sun–Thu) cover 5 dinners and 5 weekday lunches for each person.
+- **Sunday cook-ahead:** the Mon–Thu mains are cooked on Sunday. Mon–Tue's stay in the fridge, Wed–Thu's are
+  frozen once cooked and thawed the night before. Weeknights are just reheating plus one fresh vegetable dish.
 - Saturday lunch and dinner use the ingredients that last all week, plus the last frozen protein.
 - **12 of the week's 14 lunches and dinners are planned.** Sunday lunch and Friday dinner are not.
 - Breakfast and snacks are not planned (assumption). Fruit is eaten with breakfast, as snacks, or in the lunch box.
@@ -76,6 +78,9 @@ Results for the example profiles:
 - **Sun–Thu dinner:** 1 protein main + 1 vegetable dish, plus a soup on 2 of the nights.
 - Each dinner's main and vegetable dish is cooked as a **double batch**: 2 dinner portions now and
   2 lunch-box portions for the next day. Soup is eaten at dinner only and is not packed.
+- **Cook-ahead mains:** recipes marked "good to cook on Sunday" (braises, stews, curries, stir-fries that reheat well)
+  fill the Mon–Thu main slots and are cooked on Sunday. Mains that don't reheat well (fish, eggs, shrimp) go on
+  Sunday or Saturday dinner, which are cooked fresh. If one ends up on a weekday (e.g. after a swap), it is cooked that night.
 - **Lunch boxes:** pack them right after dinner. The app shows what goes in each person's box,
   in grams: main, vegetable dish, suggested rice, and that day's fruit.
 - **Saturday lunch:** one one-pot dish (for example egg fried rice, noodle soup, curry rice), built from
@@ -112,12 +117,15 @@ Each ingredient has a "cook by" day, counted from the Sunday shop. Dishes are sc
 | Thu–Sat | Cabbage, napa, carrots, celery, onions, potatoes, eggs, tofu; apples/oranges/kiwi |
 | Any cooking day | Chicken, pork, beef, frozen shrimp, all frozen on Sunday |
 
+The cook-by day applies to the day a dish is **cooked**, so a Sunday-cooked main's vegetables only need to last until Sunday.
 Lunch boxes are eaten the day after cooking, which is still within the cook-by window, because cooked food keeps 3–4 days in the fridge.
 
 ### R6 Sunday prep guide
 Built from the current menu:
-- Portion each protein by day, marinate it, then bag, label and freeze it. Proteins for Sun and Mon dinner go in the fridge, not the freezer.
-- Thaw schedule: "Mon night: move Tue's chicken thigh (500 g) to the fridge".
+- **Cook ahead** (first, longest dish first): each Mon–Thu main as a double batch, cooled within 2 h, split into a dinner box
+  and a lunch-box box. Mon–Tue's go in the fridge, Wed–Thu's in the freezer.
+- Portion the other proteins (Sun and Sat mains, soups, one-pot) by day, marinate, then bag, label and freeze. Sunday's goes in the fridge.
+- Thaw schedule: "Tue night: move Wed's cooked beef stew from the freezer to the fridge", "Fri night: move Sat's chicken thigh (310 g) to the fridge".
 - How to wash and store each vegetable (leafy greens unwashed, sturdy ones washed and dried).
 - Batch tasks: cook rice for 2–3 days, pre-cut Sun–Tue vegetables, make garlic-soy sauce and ginger-scallion oil
   if the menu uses them, and set out 10 lunch boxes (5 for each person).
@@ -132,6 +140,7 @@ Built from the current menu:
   ingredients with grams for one meal for 2 people, and steps.
 - Ingredients are picked from the ingredient list. If one is missing, you can **add a new ingredient** with
   its category, protein per 100 g, how many days it keeps after the Sunday shop, whether it freezes, and a storage tip.
+- **Good to cook on Sunday** (🍲, mains only): the dish reheats and freezes well, so the planner can put it on a Mon–Thu cook-ahead slot.
 - **Favourite** (⭐): the planner picks favourites more often. **Hide** removes a dish from planning
   without deleting it. Built-in recipes can be favourited or hidden, but not deleted.
 - New recipes are used by the planner straight away and follow the same rules (R4, R5).
@@ -253,6 +262,7 @@ Built-in recipes and ingredients come with the app code. Only your own additions
 - [ ] Default targets match the R1 table.
 - [ ] Plan totals are within ±10% of the planned-meal targets for protein foods and vegetables, and of the full-week fruit target.
 - [ ] The week follows the rhythm: 5 cooked dinners (Sun–Thu), 10 lunch boxes (Mon–Fri × 2), Friday takeout, Saturday one-pot lunch + full dinner.
+- [ ] 10 regenerated weeks: all Mon–Thu mains are cook-ahead dishes cooked on Sunday, Wed–Thu frozen with a thaw step the night before.
 - [ ] Lunch boxes are split about 44/56 (her/him) with the example profiles, and the split follows the protein targets when inputs change.
 - [ ] 10 regenerated weeks: no repeated dishes, every fresh ingredient used in 2+ dishes,
       no fish after Monday, no leafy greens after Tuesday, no dish after its cook-by day.

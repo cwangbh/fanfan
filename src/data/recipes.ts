@@ -6,6 +6,8 @@ export interface Recipe {
   kind: DishKind
   cuisine: string
   minutes: number
+  /** Main that reheats and freezes well, so it can be cooked on Sunday for a weekday dinner. */
+  cookAhead?: boolean
   /** Grams for one meal for two people. The planner scales this to the batch size and the nutrition targets. */
   items: Record<string, number>
   steps: string[]
@@ -19,17 +21,17 @@ export const RECIPES: Recipe[] = [
     steps: ['Beat the eggs with a pinch of salt. Cut the tomatoes into wedges.', 'Scramble the eggs in hot oil until just set, then remove them.', 'Stir-fry the tomatoes until soft and juicy. Add 1 tsp sugar and a pinch of salt.', 'Return the eggs, toss, and finish with scallions.'],
   },
   {
-    id: 'kung_pao_chicken', name: 'Kung pao chicken', kind: 'main', cuisine: 'Chinese', minutes: 20,
+    id: 'kung_pao_chicken', name: 'Kung pao chicken', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true,
     items: { chicken_thigh: 250, bell_pepper: 100, cucumber: 100, peanuts: 30, garlic: 10, ginger: 5, scallion: 10, soy_sauce: 15, vinegar: 10, cornstarch: 5 },
     steps: ['Cube the chicken and marinate it with soy sauce and cornstarch.', 'Mix the sauce: 1 tbsp soy sauce, 1 tbsp vinegar, 1 tsp sugar, ½ tsp cornstarch, 2 tbsp water.', 'Sear the chicken until golden. Add garlic, ginger, the diced pepper and cucumber.', 'Pour in the sauce, toss until glossy, then add peanuts and scallions.'],
   },
   {
-    id: 'red_braised_pork', name: 'Red-braised pork with eggs', kind: 'main', cuisine: 'Chinese', minutes: 70,
+    id: 'red_braised_pork', name: 'Red-braised pork with eggs', kind: 'main', cuisine: 'Chinese', minutes: 70, cookAhead: true,
     items: { pork: 250, eggs: 100, ginger: 10, scallion: 10, soy_sauce: 30 },
     steps: ['Hard-boil and peel the eggs. Cube the pork and blanch it for 2 minutes.', 'Caramelise 1 tbsp sugar in oil, add the pork, and toss until coated.', 'Add ginger, scallions, soy sauce and hot water to cover. Simmer covered for 50 minutes.', 'Add the eggs, then reduce uncovered until the sauce is sticky.'],
   },
   {
-    id: 'beef_broccoli', name: 'Beef & broccoli', kind: 'main', cuisine: 'Chinese', minutes: 20,
+    id: 'beef_broccoli', name: 'Beef & broccoli', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true,
     items: { beef: 220, broccoli: 250, garlic: 10, oyster_sauce: 20, soy_sauce: 10, cornstarch: 5 },
     steps: ['Slice the beef thin and marinate it with soy sauce and cornstarch.', 'Blanch the broccoli for 1 minute, then drain.', 'Sear the beef on high heat until just browned, then remove it.', 'Fry the garlic, add the broccoli, beef and oyster sauce, and toss for 1 minute.'],
   },
@@ -39,7 +41,7 @@ export const RECIPES: Recipe[] = [
     steps: ['Lay the fish on a plate on top of ginger slices.', 'Steam for 8–10 minutes until the fish flakes.', 'Pour off the liquid, top with shredded scallion and ginger, and drizzle with soy sauce.', 'Pour 2 tbsp smoking-hot oil over the top.'],
   },
   {
-    id: 'mapo_tofu', name: 'Mapo tofu', kind: 'main', cuisine: 'Chinese', minutes: 20,
+    id: 'mapo_tofu', name: 'Mapo tofu', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true,
     items: { tofu: 400, pork_mince: 100, garlic: 10, scallion: 10, doubanjiang: 20, cornstarch: 5 },
     steps: ['Cube the tofu and simmer it in salted water for 2 minutes, then drain.', 'Fry the pork until crisp, then add the doubanjiang and garlic until the oil turns red.', 'Add ½ cup water and the tofu, and simmer for 5 minutes.', 'Thicken with cornstarch slurry and top with scallions.'],
   },
@@ -54,42 +56,42 @@ export const RECIPES: Recipe[] = [
     steps: ['Blanch the broccoli for 1 minute.', 'Fry plenty of minced garlic in oil until fragrant.', 'Add the shrimp and cook until pink.', 'Add the broccoli and oyster sauce, and toss for 1 minute.'],
   },
   {
-    id: 'sheet_pan_chicken', name: 'Sheet-pan chicken, potatoes & carrots', kind: 'main', cuisine: 'Western', minutes: 40,
+    id: 'sheet_pan_chicken', name: 'Sheet-pan chicken, potatoes & carrots', kind: 'main', cuisine: 'Western', minutes: 40, cookAhead: true,
     items: { chicken_thigh: 300, potato: 300, carrot: 150, onion: 150, garlic: 10, olive_oil: 15, lemon: 30 },
     steps: ['Heat the oven to 220°C / 425°F.', 'Toss the cubed potatoes, carrots and onion wedges with oil, salt and garlic.', 'Put the chicken on top, season it, and squeeze over the lemon.', 'Roast for 30–35 minutes until the chicken is golden.'],
   },
   {
-    id: 'beef_stew', name: 'Beef, carrot & tomato stew', kind: 'main', cuisine: 'Western', minutes: 90,
+    id: 'beef_stew', name: 'Beef, carrot & tomato stew', kind: 'main', cuisine: 'Western', minutes: 90, cookAhead: true,
     items: { beef: 250, carrot: 200, potato: 200, onion: 150, tomato: 150, garlic: 10 },
     steps: ['Brown the cubed beef in batches.', 'Soften the onion and garlic, then add the chopped tomato.', 'Add the beef back with water to cover, and simmer covered for 60 minutes.', 'Add chunks of carrot and potato, and cook 25 more minutes until tender.'],
   },
   {
-    id: 'pepper_pork', name: 'Pork with bell peppers', kind: 'main', cuisine: 'Chinese', minutes: 15,
+    id: 'pepper_pork', name: 'Pork with bell peppers', kind: 'main', cuisine: 'Chinese', minutes: 15, cookAhead: true,
     items: { pork: 220, bell_pepper: 200, garlic: 10, soy_sauce: 15, cornstarch: 5 },
     steps: ['Slice the pork thin and marinate it with soy sauce and cornstarch.', 'Stir-fry the pork until it changes colour, then remove it.', 'Fry the garlic and the sliced peppers for 2 minutes.', 'Return the pork, add a splash of soy sauce, and toss.'],
   },
   {
-    id: 'chicken_mushroom', name: 'Chicken, mushroom & pepper stir-fry', kind: 'main', cuisine: 'Chinese', minutes: 20,
+    id: 'chicken_mushroom', name: 'Chicken, mushroom & pepper stir-fry', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true,
     items: { chicken_breast: 250, mushroom: 200, bell_pepper: 100, garlic: 10, oyster_sauce: 15, cornstarch: 5 },
     steps: ['Slice the chicken and coat it with cornstarch and a pinch of salt.', 'Sear the chicken until golden, then remove it.', 'Fry the mushrooms until browned, then add the garlic and peppers.', 'Return the chicken, add the oyster sauce, and toss.'],
   },
   {
-    id: 'beef_tomato', name: 'Tomato beef with onion', kind: 'main', cuisine: 'Chinese', minutes: 20,
+    id: 'beef_tomato', name: 'Tomato beef with onion', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true,
     items: { beef: 220, tomato: 250, onion: 100, soy_sauce: 15, cornstarch: 5 },
     steps: ['Slice the beef and marinate it with soy sauce and cornstarch.', 'Sear the beef quickly, then remove it.', 'Soften the onion, then add the tomato wedges and 1 tsp sugar, and cook into a sauce.', 'Return the beef and toss for 30 seconds.'],
   },
   {
-    id: 'cabbage_pork', name: 'Hand-torn cabbage with pork', kind: 'main', cuisine: 'Chinese', minutes: 15,
+    id: 'cabbage_pork', name: 'Hand-torn cabbage with pork', kind: 'main', cuisine: 'Chinese', minutes: 15, cookAhead: true,
     items: { pork: 150, cabbage: 300, garlic: 10, vinegar: 10, soy_sauce: 15 },
     steps: ['Tear the cabbage into pieces and slice the pork thin.', 'Render the pork until lightly crisp.', 'Add the garlic and cabbage, and stir-fry on high heat for 3 minutes.', 'Splash in vinegar and soy sauce around the edge of the wok, and toss.'],
   },
   {
-    id: 'eggplant_pork', name: 'Fish-fragrant eggplant with pork', kind: 'main', cuisine: 'Chinese', minutes: 25,
+    id: 'eggplant_pork', name: 'Fish-fragrant eggplant with pork', kind: 'main', cuisine: 'Chinese', minutes: 25, cookAhead: true,
     items: { pork_mince: 150, eggplant: 350, garlic: 10, ginger: 5, scallion: 10, doubanjiang: 15, vinegar: 10 },
     steps: ['Cut the eggplant into batons and pan-fry until soft, then remove it.', 'Fry the pork until crisp, then add the doubanjiang, garlic and ginger.', 'Add the eggplant with 1 tbsp vinegar, 1 tsp sugar and ¼ cup water.', 'Simmer for 3 minutes and top with scallions.'],
   },
   {
-    id: 'chicken_curry', name: 'Japanese chicken curry', kind: 'main', cuisine: 'Western', minutes: 35,
+    id: 'chicken_curry', name: 'Japanese chicken curry', kind: 'main', cuisine: 'Western', minutes: 35, cookAhead: true,
     items: { chicken_thigh: 250, potato: 200, carrot: 150, onion: 150, curry_roux: 50 },
     steps: ['Brown the chicken pieces with the sliced onion.', 'Add the carrot and potato chunks with 2 cups water. Simmer for 15 minutes.', 'Turn off the heat and melt in the curry roux.', 'Simmer for 5 more minutes until thick. Serve with rice.'],
   },
@@ -104,22 +106,22 @@ export const RECIPES: Recipe[] = [
     steps: ['Season the fish with salt and pepper and pat it dry.', 'Pan-fry for 3 minutes per side, then remove it.', 'Sauté the sliced zucchini with garlic until golden.', 'Serve the fish on the zucchini and squeeze over the lemon.'],
   },
   {
-    id: 'chicken_broccoli_carrot', name: 'Chicken, broccoli & carrot stir-fry', kind: 'main', cuisine: 'Chinese', minutes: 20,
+    id: 'chicken_broccoli_carrot', name: 'Chicken, broccoli & carrot stir-fry', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true,
     items: { chicken_breast: 250, broccoli: 200, carrot: 100, garlic: 10, soy_sauce: 15, cornstarch: 5 },
     steps: ['Slice the chicken and marinate it with soy sauce and cornstarch.', 'Blanch the broccoli and sliced carrot for 1 minute.', 'Sear the chicken, then add the garlic and vegetables.', 'Toss with a splash of soy sauce and water until glossy.'],
   },
   {
-    id: 'pork_green_beans', name: 'Dry-fried green beans with pork', kind: 'main', cuisine: 'Chinese', minutes: 20,
+    id: 'pork_green_beans', name: 'Dry-fried green beans with pork', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true,
     items: { pork_mince: 150, green_beans: 300, garlic: 10, soy_sauce: 15 },
     steps: ['Pan-fry the green beans in oil until blistered, then remove them.', 'Fry the pork until crisp and browned.', 'Add the garlic, the beans and soy sauce.', 'Toss on high heat for 1 minute.'],
   },
   {
-    id: 'beef_celery', name: 'Beef & celery stir-fry', kind: 'main', cuisine: 'Chinese', minutes: 15,
+    id: 'beef_celery', name: 'Beef & celery stir-fry', kind: 'main', cuisine: 'Chinese', minutes: 15, cookAhead: true,
     items: { beef: 200, celery: 200, carrot: 80, ginger: 5, soy_sauce: 15, cornstarch: 5 },
     steps: ['Shred the beef and marinate it with soy sauce and cornstarch.', 'Cut the celery and carrot into matchsticks.', 'Sear the beef on high heat, then remove it.', 'Stir-fry the ginger, celery and carrot for 2 minutes, then return the beef.'],
   },
   {
-    id: 'lions_head', name: "Lion's head meatballs with napa cabbage", kind: 'main', cuisine: 'Chinese', minutes: 45,
+    id: 'lions_head', name: "Lion's head meatballs with napa cabbage", kind: 'main', cuisine: 'Chinese', minutes: 45, cookAhead: true,
     items: { pork_mince: 250, napa: 300, ginger: 10, scallion: 10, soy_sauce: 20, cornstarch: 10 },
     steps: ['Mix the pork with grated ginger, scallions, soy sauce, cornstarch and 2 tbsp water. Form 4–6 balls.', 'Brown the meatballs on all sides.', 'Line a pot with napa leaves, put the meatballs on top, and add water halfway up.', 'Simmer covered for 30 minutes.'],
   },

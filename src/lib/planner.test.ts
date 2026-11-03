@@ -4,6 +4,8 @@ import {
   BOX_DAYS,
   buildCatalog,
   computeWeek,
+  COOK_AHEAD_DAYS,
+  cookDay,
   deadline,
   freshIds,
   generatePlan,
@@ -66,10 +68,21 @@ describe('planner (R2, R4, R5)', () => {
       // R5: nothing cooked after its cook-by day; fish by Mon, leafy greens by Tue
       for (const s of plan.slots) {
         const r = cat.byId[s.recipeId]
-        expect(deadline(r, cat)).toBeGreaterThanOrEqual(s.day)
+        expect(deadline(r, cat)).toBeGreaterThanOrEqual(cookDay(s.day, s.slot, r))
         if ('fish' in r.items) expect(s.day).toBeLessThanOrEqual(1)
         if ('spinach' in r.items || 'bok_choy' in r.items) expect(s.day).toBeLessThanOrEqual(2)
       }
+
+      // R2: Mon–Thu mains are cooked on Sunday; Wed and Thu are frozen and thawed the night before
+      for (const day of COOK_AHEAD_DAYS) {
+        const main = view.byDay[day].find((d) => d.slot === 'main')!
+        expect(main.recipe.cookAhead).toBe(true)
+        expect(main.cookDay).toBe(0)
+        expect(main.store).toBe(day >= 3 ? 'freezer' : 'fridge')
+        if (main.store === 'freezer') expect(view.thaw.some((t) => t.text.includes(main.recipe.name.toLowerCase()))).toBe(true)
+      }
+      expect(view.prep[0].items).toHaveLength(COOK_AHEAD_DAYS.length)
+      for (const d of view.dishes) if (d.slot !== 'main' || d.day === 0 || d.day === 6) expect(d.cookDay).toBe(d.day)
 
       // R3: totals within ±10% of the planned-meal targets
       for (const k of ['proteinFoods', 'veg', 'fruit'] as const) {
@@ -128,6 +141,22 @@ describe('planner (R2, R4, R5)', () => {
       expect(o.recipe.kind).toBe('main')
       expect(deadline(o.recipe, cat)).toBe(6)
     }
+  })
+
+  it('a main that does not reheat well is cooked fresh on its weekday', () => {
+    const plan = generatePlan({ catalog: cat, weekStart: '2026-11-01', seed: 1 })
+    const idx = plan.slots.findIndex((s) => s.slot === 'main' && s.day === 2)
+    const opts = swapOptions(plan, idx, cat)
+    expect(opts.map((o) => o.recipe.id)).not.toContain('steamed_fish')
+    const firstFresh = opts.findIndex((o) => !o.recipe.cookAhead)
+    const lastAhead = opts.findLastIndex((o) => o.recipe.cookAhead && o.newCount === opts[firstFresh]?.newCount)
+    if (firstFresh >= 0 && lastAhead >= 0) expect(lastAhead).toBeLessThan(firstFresh)
+    const slots = plan.slots.map((s, i) => (i === idx ? { ...s, recipeId: 'shrimp_eggs' } : s))
+    const view = computeWeek({ ...plan, slots }, cat, people)
+    const tue = view.byDay[2].find((d) => d.slot === 'main')!
+    expect(tue.cookDay).toBe(2)
+    expect(tue.store).toBeUndefined()
+    expect(view.prep[0].items).toHaveLength(COOK_AHEAD_DAYS.length - 1)
   })
 
   it('weeks start on Sunday', () => {

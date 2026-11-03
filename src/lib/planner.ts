@@ -9,6 +9,12 @@ export const COOK_DAYS = [0, 1, 2, 3, 4, 6]
 export const BOX_DAYS = [0, 1, 2, 3, 4]
 const SOUP_DAYS = [1, 3]
 export const ONEPOT_DAY = 6
+/** Weekday dinners whose main is cooked on Sunday and reheated. */
+export const COOK_AHEAD_DAYS = [1, 2, 3, 4]
+/** Cook-ahead mains for this day and later are frozen once cooked; earlier ones stay in the fridge. */
+export const FREEZE_COOKED_FROM = 3
+/** Dinners whose main is cooked fresh that night: fish and egg mains go here. */
+const FRESH_MAIN_DAYS = [0, 6]
 /** The plan covers 12 of the week's 14 lunches and dinners (no Sunday lunch, Friday is takeout). */
 export const PLANNED_MEAL_SHARE = 12 / 14
 /** Rough raw → cooked weight factor, used for portion guides. */
@@ -104,6 +110,11 @@ export function batchSize(s: PlanSlot): number {
   return (s.slot === 'main' || s.slot === 'veg') && BOX_DAYS.includes(s.day) ? 2 : 1
 }
 
+/** Day the dish is cooked: Sunday for a cook-ahead main on a weekday, otherwise the day it is eaten. */
+export function cookDay(day: number, slot: Slot, r: Recipe): number {
+  return slot === 'main' && r.cookAhead && COOK_AHEAD_DAYS.includes(day) ? 0 : day
+}
+
 export function mulberry32(seed: number) {
   let a = seed >>> 0
   return () => {
@@ -148,9 +159,41 @@ function scheduleKind(ids: string[], days: number[], ctx: Ctx, slot: Slot) {
   return { slots, late }
 }
 
+/**
+ * Mains that don't reheat well take the fresh nights (Sun, Sat) first; cook-ahead mains fill the
+ * weekdays and are cooked on Sunday, so their deadline only has to reach Sunday.
+ */
+function scheduleMains(ids: string[], ctx: Ctx) {
+  const info = ids.map((id) => ({ id, r: ctx.cat.byId[id], d: deadline(ctx.cat.byId[id], ctx.cat), t: ctx.tie.get(id) ?? 0 }))
+  const byDeadline = (a: (typeof info)[number], b: (typeof info)[number]) => a.d - b.d || a.t - b.t
+  const fresh = info.filter((o) => !o.r.cookAhead).sort(byDeadline)
+  const ahead = info.filter((o) => o.r.cookAhead).sort(byDeadline)
+  const freeDays = new Set(COOK_DAYS)
+  const placed: { o: (typeof info)[number]; day: number }[] = []
+  for (const o of fresh) {
+    const day = FRESH_MAIN_DAYS.find((d) => freeDays.has(d) && o.d >= d)
+    if (day === undefined) continue
+    freeDays.delete(day)
+    placed.push({ o, day })
+  }
+  // Fresh mains that didn't fit Sun/Sat are cooked on a weekday night, earliest deadline first.
+  const leftover = fresh.filter((o) => !placed.some((p) => p.o === o))
+  const rest = [...leftover, ...ahead]
+  const days = [...freeDays].sort((a, b) => a - b)
+  rest.forEach((o, i) => placed.push({ o, day: days[i] }))
+  let late = 0
+  let weekdayFresh = 0
+  const slots = placed.map(({ o, day }) => {
+    if (o.d < cookDay(day, 'main', o.r)) late++
+    if (COOK_AHEAD_DAYS.includes(day) && !o.r.cookAhead) weekdayFresh++
+    return { day, slot: 'main' as const, recipeId: o.id }
+  })
+  return { slots, late, weekdayFresh }
+}
+
 function evaluate(sel: Selection, ctx: Ctx): Scored {
   const { cat, recent } = ctx
-  const mains = scheduleKind(sel.main, COOK_DAYS, ctx, 'main')
+  const mains = scheduleMains(sel.main, ctx)
   const vegs = scheduleKind(sel.veg, COOK_DAYS, ctx, 'veg')
   const soups = scheduleKind(sel.soup, SOUP_DAYS, ctx, 'soup')
   const onepot = scheduleKind(sel.onepot, [ONEPOT_DAY], ctx, 'onepot')
@@ -170,6 +213,7 @@ function evaluate(sel: Selection, ctx: Ctx): Scored {
   const leafy = veg.some((id) => cat.ingredients[id].leafy)
   const penalty =
     late * 1000 +
+    mains.weekdayFresh * 150 +
     (singles + overUsed + Math.max(0, MIN_PROTEIN_FAMILIES - proteinUse.size)) * 100 +
     Math.max(0, MIN_VEG_TYPES - veg.length) * 40 +
     (leafy ? 0 : 60) +
@@ -194,6 +238,7 @@ function greedy(ctx: Ctx, rng: () => number): Selection | null {
   for (const kind of order) {
     const vegTypes = [...used].filter((id) => cat.ingredients[id].category === 'veg' && !cat.ingredients[id].notVeg).length
     const hasLeafy = [...used].some((id) => cat.ingredients[id].leafy)
+    const aheadCount = sel.main.filter((id) => cat.byId[id].cookAhead).length
     let best: CatalogRecipe | undefined
     let bestScore = -Infinity
     for (const r of pools[kind]) {
@@ -208,8 +253,9 @@ function greedy(ctx: Ctx, rng: () => number): Selection | null {
       const vegBonus = vegTypes < MIN_VEG_TYPES ? newVeg * 3.5 : 0
       const familyBonus = mp && !proteinUse.has(mp) && proteinUse.size < MIN_PROTEIN_FAMILIES ? 4 : 0
       const leafyBonus = !hasLeafy && fresh.some((id) => cat.ingredients[id].leafy) ? 3 : 0
+      const aheadBonus = kind === 'main' && r.cookAhead && aheadCount < COOK_AHEAD_DAYS.length ? 3 : 0
       const score =
-        2 * overlap - 3 * (fresh.length - overlap) + vegBonus + familyBonus + leafyBonus +
+        aheadBonus + 2 * overlap - 3 * (fresh.length - overlap) + vegBonus + familyBonus + leafyBonus +
         (r.favourite ? 1.5 : 0) - (recent.has(r.id) ? 3 : 0) + rng() * 3
       if (score > bestScore) {
         bestScore = score
@@ -318,6 +364,10 @@ export interface DishView extends PlanSlot {
   items: Amount[]
   /** Estimated cooked grams of one meal for both people, split by person. */
   portion: number[]
+  /** Day it is cooked: 0 for a main cooked ahead on Sunday. */
+  cookDay: number
+  /** Where a cook-ahead main waits until its day. */
+  store?: 'fridge' | 'freezer'
 }
 
 export interface Box {
@@ -397,7 +447,9 @@ export function computeWeek(plan: WeekPlan, cat: Catalog, people: Person[]): Wee
       warnings.push(`A recipe on ${DAY_NAMES[s.day]} no longer exists. Swap it for another dish.`)
       return []
     }
-    return [{ ...s, index, recipe, batch: batchSize(s) }]
+    const cd = cookDay(s.day, s.slot, recipe)
+    const store: DishView['store'] = cd === s.day ? undefined : s.day >= FREEZE_COOKED_FROM ? 'freezer' : 'fridge'
+    return [{ ...s, index, recipe, batch: batchSize(s), cookDay: cd, store }]
   })
 
   // Scale protein and vegetable amounts so the week hits the targets for the planned meals.
@@ -480,7 +532,7 @@ export function computeWeek(plan: WeekPlan, cat: Catalog, people: Person[]): Wee
     }
     for (const id of freshIds(d.recipe, cat)) {
       const ing = cat.ingredients[id]
-      if (ing.useBy < d.day) {
+      if (ing.useBy < d.cookDay) {
         warnings.push(`${d.recipe.name} on ${DAY_NAMES[d.day]} uses ${ing.name.toLowerCase()}, which should be cooked by ${DAY_NAMES[ing.useBy]}.`)
       }
     }
@@ -553,8 +605,23 @@ function buildShopping(usage: Map<string, { g: number; dishes: Set<string> }>, f
 
 function buildPrep(dishes: DishView[], usage: Map<string, { g: number; dishes: Set<string> }>, plan: WeekPlan, cat: Catalog) {
   const proteinItems: ChecklistItem[] = []
+  const cookAhead: (ChecklistItem & { minutes: number })[] = []
   const thaw: ThawEntry[] = []
   for (const d of [...dishes].sort((a, b) => a.day - b.day)) {
+    if (d.cookDay !== d.day) {
+      // Cooked today, so its meat never needs raw portioning or freezing.
+      const day = DAY_NAMES[d.day]
+      const meals = `${day} dinner + ${DAY_NAMES[d.day + 1]} lunch boxes`
+      const keep =
+        d.store === 'freezer'
+          ? `Cool it within 2 hours, split it into a dinner box and a lunch-box box, and freeze them flat, labelled "${day}".`
+          : `Cool it within 2 hours, split it into a dinner box and a lunch-box box, and keep them in the fridge.`
+      cookAhead.push({ id: `ahead:${d.index}`, minutes: d.recipe.minutes, text: `${d.recipe.name} (${d.recipe.minutes} min, double batch) for ${meals}. ${keep}` })
+      if (d.store === 'freezer') {
+        thaw.push({ when: `${DAY_NAMES[d.day - 1]} night`, text: `Move ${day}'s cooked ${d.recipe.name.toLowerCase()} (dinner and lunch-box boxes) from the freezer to the fridge.` })
+      }
+      continue
+    }
     for (const it of d.items) {
       const ing = cat.ingredients[it.id]
       if (ing?.category !== 'protein' || it.id === 'eggs' || it.id === 'tofu') continue
@@ -590,7 +657,7 @@ function buildPrep(dishes: DishView[], usage: Map<string, { g: number; dishes: S
   const uses = (r: Recipe, ...ids: string[]) => ids.every((id) => id in r.items)
   const preCut = new Set<string>()
   for (const d of dishes) {
-    if (d.day > 2) continue
+    if (d.day > 2 || d.cookDay !== d.day) continue
     for (const id of freshIds(d.recipe, cat)) {
       const ing = cat.ingredients[id]
       if (ing.preCut) preCut.add(ing.name.toLowerCase())
@@ -607,8 +674,14 @@ function buildPrep(dishes: DishView[], usage: Map<string, { g: number; dishes: S
     batch.push({ id: 'batch:ginger_scallion', text: 'Make ginger-scallion oil: pour hot oil over minced ginger, scallion and salt. Use it on steamed dishes, noodles and rice.' })
   }
   batch.push({ id: 'batch:boxes', text: 'Set out 10 lunch boxes, 5 each, labelled Her / Him.' })
+  if (cookAhead.length) batch.push({ id: 'batch:ahead_boxes', text: `Set out ${cookAhead.length * 2} containers for the cook-ahead mains (one for dinner, one for the lunch boxes, per dish).` })
 
   const prep: PrepSection[] = [
+    {
+      id: 'ahead',
+      title: 'Cook ahead for Mon–Thu (longest first)',
+      items: cookAhead.sort((a, b) => b.minutes - a.minutes).map(({ id, text }) => ({ id, text })),
+    },
     { id: 'protein', title: 'Portion the proteins', items: proteinItems },
     { id: 'veg', title: 'Store vegetables & fruit', items: vegItems },
     { id: 'batch', title: 'Batch tasks', items: batch },
@@ -637,10 +710,12 @@ export function swapOptions(plan: WeekPlan, slotIndex: number, cat: Catalog): Sw
   const basket = new Set(
     plan.slots.flatMap((s, i) => (i === slotIndex || !cat.byId[s.recipeId] ? [] : freshIds(cat.byId[s.recipeId], cat))),
   )
+  // On a cook-ahead night, mains that can be cooked on Sunday come first.
+  const ahead = (r: Recipe) => Number(cookDay(target.day, target.slot, r) !== target.day)
   return cat.recipes
-    .filter((r) => r.kind === target.slot && !r.hidden && !inPlan.has(r.id) && deadline(r, cat) >= target.day)
+    .filter((r) => r.kind === target.slot && !r.hidden && !inPlan.has(r.id) && deadline(r, cat) >= cookDay(target.day, target.slot, r))
     .map((recipe) => ({ recipe, newCount: freshIds(recipe, cat).filter((id) => !basket.has(id)).length }))
-    .sort((a, b) => a.newCount - b.newCount || Number(!!b.recipe.favourite) - Number(!!a.recipe.favourite) || a.recipe.name.localeCompare(b.recipe.name))
+    .sort((a, b) => a.newCount - b.newCount || ahead(b.recipe) - ahead(a.recipe) || Number(!!b.recipe.favourite) - Number(!!a.recipe.favourite) || a.recipe.name.localeCompare(b.recipe.name))
 }
 
 // ---------- Dates and history ----------
