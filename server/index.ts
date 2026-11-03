@@ -13,6 +13,10 @@ const DATA_DIR = resolve(process.env.DATA_DIR ?? './data')
 const STATIC_DIR = resolve(process.env.STATIC_DIR ?? './dist')
 const PAGE_SIZE = 1000
 const MAX_BATCH = 2000
+/** Comma-separated household ids this server serves. Unset = any valid id (first-time setup). */
+const ALLOWED = new Set((process.env.FANFAN_HOUSEHOLDS ?? '').split(',').map((s) => s.trim()).filter(Boolean))
+/** Writes are refused once the database file grows past this. */
+const MAX_DB_BYTES = Number(process.env.FANFAN_MAX_DB_MB ?? 200) * 1024 * 1024
 
 mkdirSync(DATA_DIR, { recursive: true })
 const db = new DatabaseSync(join(DATA_DIR, 'meals.db'))
@@ -44,6 +48,11 @@ const selectSince = db.prepare(
   'SELECT collection, key, data, updated_at, deleted, seq FROM records WHERE household = ? AND seq > ? ORDER BY seq LIMIT ?',
 )
 const selectAll = db.prepare('SELECT collection, key, data, updated_at, deleted FROM records WHERE household = ? AND deleted = 0')
+const dbSize = () => {
+  const { page_count } = db.prepare('PRAGMA page_count').get() as { page_count: number }
+  const { page_size } = db.prepare('PRAGMA page_size').get() as { page_size: number }
+  return page_count * page_size
+}
 
 interface Row {
   collection: string
@@ -71,7 +80,9 @@ app.use('/api/*', async (c, next) => {
 app.get('/api/health', (c) => c.json({ ok: true }))
 
 app.use('/api/households/:id/*', async (c, next) => {
-  if (!HOUSEHOLD_RE.test(c.req.param('id') ?? '')) return c.json({ error: 'Invalid household id' }, 400)
+  const id = c.req.param('id') ?? ''
+  if (!HOUSEHOLD_RE.test(id)) return c.json({ error: 'Invalid household id' }, 400)
+  if (ALLOWED.size && !ALLOWED.has(id)) return c.json({ error: 'This server only serves its own household' }, 403)
   await next()
 })
 
@@ -86,8 +97,9 @@ app.get('/api/households/:id/changes', (c) => {
   })
 })
 
-app.post('/api/households/:id/changes', bodyLimit({ maxSize: 10 * 1024 * 1024 }), async (c) => {
+app.post('/api/households/:id/changes', bodyLimit({ maxSize: 5 * 1024 * 1024 }), async (c) => {
   const household = c.req.param('id')
+  if (dbSize() > MAX_DB_BYTES) return c.json({ error: 'Storage limit reached' }, 507)
   const body = (await c.req.json().catch(() => null)) as { records?: unknown[] } | null
   if (!body || !Array.isArray(body.records) || body.records.length > MAX_BATCH) {
     return c.json({ error: `Send { records: [...] } with at most ${MAX_BATCH} records` }, 400)
@@ -132,7 +144,7 @@ const indexHtml = join(STATIC_DIR, 'index.html')
 app.get('*', (c) => (existsSync(indexHtml) ? c.html(readFileSync(indexHtml, 'utf8')) : c.text('App not built. Run npm run build.', 404)))
 
 serve({ fetch: app.fetch, port: PORT }, () => {
-  console.log(`Fanfan on http://localhost:${PORT} (data: ${DATA_DIR})`)
+  console.log(`Fanfan on http://localhost:${PORT} (data: ${DATA_DIR}, households: ${ALLOWED.size ? `${ALLOWED.size} allowed` : 'any'})`)
 })
 
 for (const sig of ['SIGINT', 'SIGTERM']) {

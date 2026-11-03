@@ -37,6 +37,7 @@ export function RecipeForm({ catalog, initial, onClose }: Props) {
   )
   const [steps, setSteps] = useState(initial?.steps.join('\n') ?? '')
   const [favourite, setFavourite] = useState(!!initial?.favourite)
+  const [cookAhead, setCookAhead] = useState(!!initial?.cookAhead)
   const [addingIngredient, setAddingIngredient] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -58,6 +59,7 @@ export function RecipeForm({ catalog, initial, onClose }: Props) {
       kind,
       cuisine: cuisine.trim() || 'Other',
       minutes: Math.max(1, Number(minutes) || 20),
+      ...(kind === 'main' && cookAhead && { cookAhead: true }),
       items,
       steps: steps.split('\n').map((s) => s.trim()).filter(Boolean),
     }
@@ -164,6 +166,13 @@ export function RecipeForm({ catalog, initial, onClose }: Props) {
           Steps (one per line)
           <textarea value={steps} onChange={(e) => setSteps(e.target.value)} placeholder={'Slice the lamb…\nStir-fry with cumin…'} />
         </label>
+
+        {kind === 'main' && (
+          <label className="check">
+            <input type="checkbox" checked={cookAhead} onChange={(e) => setCookAhead(e.target.checked)} />
+            <span className="check-text">🍲 Good to cook on Sunday: it reheats and freezes well</span>
+          </label>
+        )}
 
         <label className="check">
           <input type="checkbox" checked={favourite} onChange={(e) => setFavourite(e.target.checked)} />
