@@ -69,6 +69,7 @@ const list: Ingredient[] = [
   { id: 'cauliflower', name: 'Cauliflower 花菜', category: 'veg', preCut: true, protein: 1.9, useBy: 4, each: { g: 600, label: 'head', plural: 'heads' }, storage: 'Break into florets, keep dry in a bag in the crisper.' },
   { id: 'green_pepper', name: 'Green pepper 青椒/尖椒', category: 'veg', preCut: true, protein: 1, useBy: 4, each: { g: 60, label: 'pepper', plural: 'peppers' }, storage: 'Keep whole and dry in the crisper.' },
   { id: 'daikon', name: 'Daikon 白萝卜', category: 'veg', protein: 0.6, useBy: 6, each: { g: 800, label: 'daikon', plural: 'daikons' }, storage: 'Cut off the leaves, wrap in paper and keep in the crisper. Lasts 2 weeks.' },
+  { id: 'edamame', name: 'Shelled edamame (frozen) 毛豆米', category: 'veg', protein: 13, useBy: 6, freezable: true, storage: 'Buy frozen and keep frozen. Cook straight from frozen.' },
 
   // Aromatics: bought every week, not counted towards the "used twice" rule
   { id: 'garlic', name: 'Garlic 大蒜', category: 'aromatic', protein: 0, useBy: 6, storage: 'Keep whole heads in a dry basket.' },
@@ -116,6 +117,11 @@ const list: Ingredient[] = [
   { id: 'rice_cake', name: 'Rice cakes 年糕', category: 'pantry', protein: 0, useBy: 6, storage: '' },
   { id: 'olive_veg', name: 'Preserved olive greens 橄榄菜', category: 'pantry', protein: 0, useBy: 6, storage: '' },
   { id: 'peas_corn', name: 'Frozen peas & corn 青豆玉米', category: 'pantry', protein: 0, useBy: 6, storage: '' },
+  { id: 'duojiao', name: 'Chopped salted chili 剁椒', category: 'pantry', protein: 0, useBy: 6, storage: '' },
+  { id: 'chestnuts', name: 'Peeled chestnuts 板栗仁', category: 'pantry', protein: 0, useBy: 6, storage: '' },
+  { id: 'rice_powder', name: 'Steamed-pork rice powder 蒸肉米粉', category: 'pantry', protein: 0, useBy: 6, storage: '' },
+  { id: 'meigancai', name: 'Dried preserved mustard greens 梅干菜', category: 'pantry', protein: 0, useBy: 6, storage: '' },
+  { id: 'dried_shiitake', name: 'Dried shiitake 干香菇', category: 'pantry', protein: 0, useBy: 6, storage: '' },
 ]
 
 export const INGREDIENTS: Record<string, Ingredient> = Object.fromEntries(list.map((i) => [i.id, i]))

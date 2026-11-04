@@ -65,7 +65,7 @@ export function RecipeView({ recipe, dish, catalog }: { recipe: CatalogRecipe; d
             <p className="tiny muted" style={{ marginBottom: 0 }}>
               From{' '}
               <a href={recipe.source} target="_blank" rel="noreferrer">
-                HowToCook 程序员做饭指南 ↗
+                {recipe.source.includes('CookLikeHOC') ? 'CookLikeHOC 像老乡鸡那样做饭' : 'HowToCook 程序员做饭指南'} ↗
               </a>
               {dish && dish.batch === 2 && '. Amounts in the steps are for this double batch.'}
             </p>

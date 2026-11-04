@@ -146,6 +146,8 @@ interface Scored {
   sel: Selection
   slots: PlanSlot[]
   penalty: number
+  /** Number of weekly rules the selection breaks (0 for a valid week). */
+  broken: number
 }
 
 /** Earliest-deadline-first: the most perishable dish goes on the earliest day. */
@@ -215,16 +217,19 @@ function evaluate(sel: Selection, ctx: Ctx): Scored {
   const overUsed = [...proteinUse.values()].reduce((s, n) => s + Math.max(0, n - 2), 0)
   const veg = [...used.keys()].filter((id) => cat.ingredients[id].category === 'veg' && !cat.ingredients[id].notVeg)
   const leafy = veg.some((id) => cat.ingredients[id].leafy)
+  const familiesShort = Math.max(0, MIN_PROTEIN_FAMILIES - proteinUse.size)
+  const vegShort = Math.max(0, MIN_VEG_TYPES - veg.length)
   const penalty =
     late * 1000 +
     mains.weekdayFresh * 150 +
-    (singles + overUsed + Math.max(0, MIN_PROTEIN_FAMILIES - proteinUse.size)) * 100 +
-    Math.max(0, MIN_VEG_TYPES - veg.length) * 40 +
-    (leafy ? 0 : 60) +
+    (singles + overUsed + familiesShort) * 100 +
+    vegShort * 100 +
+    (leafy ? 0 : 150) +
     used.size +
     all.filter((id) => recent.has(id)).length * 3 -
     all.filter((id) => cat.byId[id].favourite).length * 2
-  return { sel, slots: [...mains.slots, ...vegs.slots, ...soups.slots, ...onepot.slots], penalty }
+  const broken = late + mains.weekdayFresh + singles + overUsed + familiesShort + vegShort + (leafy ? 0 : 1)
+  return { sel, slots: [...mains.slots, ...vegs.slots, ...soups.slots, ...onepot.slots], penalty, broken }
 }
 
 /** Greedy pick that prefers dishes sharing ingredients already in the basket. */
@@ -343,10 +348,12 @@ export function generatePlan({ catalog, weekStart, seed, recent = new Set(), att
     throw new Error('Not enough recipes to fill a week. You need at least 6 mains, 6 vegetable dishes, 2 soups and 1 Saturday one-pot.')
   }
   found.sort((a, b) => a.penalty - b.penalty)
-  const best = found
-    .slice(0, 5)
-    .map((f) => improve(f, ctx))
-    .reduce((a, b) => (b.penalty < a.penalty ? b : a))
+  // Polish the best 5; while the best week still breaks a rule, keep polishing further down the list.
+  let best = improve(found[0], ctx)
+  for (let i = 1; i < Math.min(found.length, 40) && (i < 5 || best.broken > 0); i++) {
+    const next = improve(found[i], ctx)
+    if (next.penalty < best.penalty) best = next
+  }
   const slots = best.slots.sort((a, b) => a.day - b.day || SLOT_ORDER[a.slot] - SLOT_ORDER[b.slot])
   return { weekStart, seed, slots, fruit: planFruit(rng) }
 }
