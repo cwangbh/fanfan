@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { addDays, DAY_NAMES, fromISO, KIND_LABELS, swapOptions, type Catalog, type DishView, type WeekPlan, type WeekView } from '../lib/planner.ts'
+import { addDays, DAY_NAMES, dishName, fromISO, KIND_LABELS, swapOptions, type Catalog, type DishView, type WeekPlan, type WeekView } from '../lib/planner.ts'
 import type { Person } from '../lib/nutrition.ts'
 
 interface Props {
@@ -22,7 +22,7 @@ export function WeekTab({ plan, view, catalog, people, onOpenDish, onSwap, onReg
         <div className="row">
           <button className="link-btn" onClick={() => onOpenDish(d)}>
             {d.recipe.favourite && '⭐ '}
-            {d.recipe.name}
+            {dishName(d.recipe)}
           </button>
           <span className="spacer" />
           <button className="btn small" onClick={() => setSwapping(swapping === d.index ? null : d.index)} aria-expanded={swapping === d.index}>
@@ -30,6 +30,7 @@ export function WeekTab({ plan, view, catalog, people, onOpenDish, onSwap, onReg
           </button>
         </div>
         <div className="tiny muted">
+          {d.recipe.zh && <>{d.recipe.name} · </>}
           {KIND_LABELS[d.slot]} · {d.recipe.minutes} min · <span className="her">{d.portion[0]} g</span> / <span className="him">{d.portion[1]} g</span>
           {d.cookDay !== d.day
             ? ` · 🍲 cooked Sunday, reheat${d.store === 'freezer' ? ' · ❄️ thaw the night before' : ''}`
@@ -154,8 +155,8 @@ export function WeekTab({ plan, view, catalog, people, onOpenDish, onSwap, onReg
 }
 
 function dinnerHint(dinner: DishView[], day: number): string {
-  const reheat = dinner.filter((d) => d.cookDay !== d.day).map((d) => d.recipe.name)
-  const fresh = dinner.filter((d) => d.cookDay === d.day && d.slot !== 'soup').map((d) => d.recipe.name)
+  const reheat = dinner.filter((d) => d.cookDay !== d.day).map((d) => dishName(d.recipe))
+  const fresh = dinner.filter((d) => d.cookDay === d.day && d.slot !== 'soup').map((d) => dishName(d.recipe))
   const pack = `pack half of the main and the vegetable dish into ${DAY_NAMES[day + 1]}'s lunch boxes.`
   if (!reheat.length) return `After dinner, ${pack}`
   return `Reheat ${reheat.join(', ')}. Cook ${fresh.join(', ') || 'the rest'} fresh. After dinner, ${pack}`
@@ -170,7 +171,7 @@ function SwapList({ plan, index, catalog, onPick }: { plan: WeekPlan; index: num
         <button key={o.recipe.id} onClick={() => onPick(o.recipe.id)}>
           <span style={{ flex: 1 }}>
             {o.recipe.favourite && '⭐ '}
-            {o.recipe.name}
+            {dishName(o.recipe)}
           </span>
           <span className={`badge${o.newCount === 0 ? ' accent' : ''}`}>{o.newCount === 0 ? 'nothing new' : `+${o.newCount} to buy`}</span>
         </button>

@@ -12,6 +12,7 @@ import { saveWeek, setCheck, setRecipeFlags, useHouseholdData } from './lib/data
 import {
   addDays,
   computeWeek,
+  dishName,
   formatWeek,
   generatePlan,
   recentRecipeIds,
@@ -190,7 +191,7 @@ function Household() {
 
       {recipe && (
         <Sheet
-          title={recipe.name}
+          title={dishName(recipe)}
           onClose={() => setOpenRecipe(null)}
           actions={
             <button

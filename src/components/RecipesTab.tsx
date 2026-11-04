@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import type { DishKind } from '../data/recipes.ts'
 import { setRecipeFlags } from '../lib/data.ts'
-import { DAY_NAMES, KIND_LABELS, type Catalog, type CatalogRecipe, type DishView, type WeekView } from '../lib/planner.ts'
+import { DAY_NAMES, KIND_LABELS, dishName, type Catalog, type CatalogRecipe, type DishView, type WeekView } from '../lib/planner.ts'
 
 type Filter = 'all' | DishKind | 'fav' | 'mine' | 'hidden'
 const FILTERS: [Filter, string][] = [
@@ -41,9 +41,10 @@ export function RecipesTab({ catalog, view, onOpen, onAdd }: Props) {
         (r) =>
           !needle ||
           r.name.toLowerCase().includes(needle) ||
+          r.zh?.includes(needle) ||
           Object.keys(r.items).some((id) => catalog.ingredients[id]?.name.toLowerCase().includes(needle)),
       )
-      .sort((a, b) => Number(!!b.favourite) - Number(!!a.favourite) || a.name.localeCompare(b.name))
+      .sort((a, b) => Number(!!b.favourite) - Number(!!a.favourite) || dishName(a).localeCompare(dishName(b), 'zh'))
   }, [catalog, q, filter])
 
   return (
@@ -60,7 +61,7 @@ export function RecipesTab({ catalog, view, onOpen, onAdd }: Props) {
               <li key={d.index} className="row">
                 <span className={`kind-dot kind-${d.slot}`} style={{ marginTop: 0 }} />
                 <button className="link-btn" style={{ flex: 1 }} onClick={() => onOpen(d.recipe, d)}>
-                  {d.recipe.name}
+                  {dishName(d.recipe)}
                 </button>
                 <span className="tiny muted">{DAY_NAMES[d.day]}</span>
               </li>
@@ -89,9 +90,10 @@ export function RecipesTab({ catalog, view, onOpen, onAdd }: Props) {
               <span className={`kind-dot kind-${r.kind}`} style={{ marginTop: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <button className="link-btn" onClick={() => onOpen(r)}>
-                  {r.name}
+                  {dishName(r)}
                 </button>
                 <div className="tiny muted">
+                  {r.zh && `${r.name} · `}
                   {KIND_LABELS[r.kind]} · {r.cuisine} · {r.minutes} min{r.custom ? ' · mine' : ''}
                   {r.hidden ? ' · hidden' : ''}
                 </div>

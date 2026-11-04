@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import QRCode from 'qrcode'
 import { savePeople } from '../lib/data.ts'
 import { ACTIVITY_FACTORS, householdTargets, type Activity, type Person, type Sex } from '../lib/nutrition.ts'
-import { formatGrams, formatWeek, mostCooked, PLANNED_MEAL_SHARE, type Catalog, type WeekPlan, type WeekView } from '../lib/planner.ts'
+import { dishName, formatGrams, formatWeek, mostCooked, PLANNED_MEAL_SHARE, type Catalog, type WeekPlan, type WeekView } from '../lib/planner.ts'
 import { exportFile, householdLink, importFile, leaveHousehold, syncNow, type Snapshot } from '../lib/store.ts'
 import { Progress, Segmented } from './ui.tsx'
 
@@ -229,7 +229,7 @@ function HistoryView({ weeks, catalog, currentWeek, onOpenWeek, onReuseWeek }: P
           <ul className="list">
             {top.map(({ recipe, count }) => (
               <li key={recipe.id} className="row">
-                <span>{recipe.name}</span>
+                <span>{dishName(recipe)}</span>
                 <span className="spacer" />
                 <span className="badge">{count}×</span>
               </li>

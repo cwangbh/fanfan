@@ -1,4 +1,4 @@
-import { DAY_NAMES, KIND_LABELS, formatItem, freshIds, type Catalog, type CatalogRecipe, type DishView } from '../lib/planner.ts'
+import { DAY_NAMES, KIND_LABELS, dishName, formatItem, freshIds, renderStep, type Catalog, type CatalogRecipe, type DishView } from '../lib/planner.ts'
 
 /** Ingredients, steps and portion guide for one recipe. With `dish`, amounts are this week's scaled batch. */
 export function RecipeView({ recipe, dish, catalog }: { recipe: CatalogRecipe; dish?: DishView; catalog: Catalog }) {
@@ -6,16 +6,19 @@ export function RecipeView({ recipe, dish, catalog }: { recipe: CatalogRecipe; d
   const fresh = freshIds(recipe, catalog)
   const sharing = catalog.recipes
     .filter((r) => r.id !== recipe.id && !r.hidden && freshIds(r, catalog).some((id) => fresh.includes(id)))
-    .map((r) => r.name)
+    .map(dishName)
+  const amounts = Object.fromEntries(items.map((it) => [it.id, it.g]))
 
   return (
     <div className="stack">
+      {recipe.zh && <p className="muted small" style={{ margin: 0 }}>{recipe.name}</p>}
       <div className="row wrap">
         <span className="badge accent">{KIND_LABELS[recipe.kind]}</span>
         <span className="badge">{recipe.cuisine}</span>
         <span className="badge">⏱ {recipe.minutes} min</span>
         {recipe.favourite && <span className="badge">⭐ Favourite</span>}
         {recipe.custom && <span className="badge">My recipe</span>}
+        {recipe.cookAhead && <span className="badge">🍲 Cook ahead</span>}
       </div>
 
       <div className="card flat">
@@ -55,9 +58,18 @@ export function RecipeView({ recipe, dish, catalog }: { recipe: CatalogRecipe; d
           <h3 style={{ marginBottom: 6 }}>Steps</h3>
           <ol className="steps">
             {recipe.steps.map((s, i) => (
-              <li key={i}>{s}</li>
+              <li key={i}>{renderStep(s, amounts, catalog)}</li>
             ))}
           </ol>
+          {recipe.source && (
+            <p className="tiny muted" style={{ marginBottom: 0 }}>
+              From{' '}
+              <a href={recipe.source} target="_blank" rel="noreferrer">
+                HowToCook 程序员做饭指南 ↗
+              </a>
+              {dish && dish.batch === 2 && '. Amounts in the steps are for this double batch.'}
+            </p>
+          )}
         </div>
       )}
 

@@ -19,7 +19,7 @@ const FRESH_MAIN_DAYS = [0, 6]
 export const PLANNED_MEAL_SHARE = 12 / 14
 /** Rough raw → cooked weight factor, used for portion guides. */
 const COOKED_FACTOR = 0.85
-const STARCHES = new Set(['rice', 'noodles', 'pasta'])
+const STARCHES = new Set(['rice', 'noodles', 'pasta', 'rice_cake'])
 
 export const KIND_LABELS: Record<DishKind, string> = {
   main: 'Main',
@@ -52,16 +52,20 @@ export function buildCatalog(
   flags: Record<string, RecipeFlags> = {},
   customIngredients: Ingredient[] = [],
 ): Catalog {
-  const recipes: CatalogRecipe[] = [
+  const all: CatalogRecipe[] = [
     ...RECIPES.map((r) => ({ ...r, ...flags[r.id] })),
     ...custom.map((r) => ({ ...r, custom: true })),
   ]
   return {
-    recipes,
-    byId: Object.fromEntries(recipes.map((r) => [r.id, r])),
+    // Retired recipes still resolve by id, so past weeks show them, but are never listed or planned.
+    recipes: all.filter((r) => !r.retired),
+    byId: Object.fromEntries(all.map((r) => [r.id, r])),
     ingredients: { ...INGREDIENTS, ...Object.fromEntries(customIngredients.map((i) => [i.id, i])) },
   }
 }
+
+/** Name shown in the app: Chinese first when the recipe has one. */
+export const dishName = (r: Recipe) => r.zh ?? r.name
 
 const isFresh = (ing: Ingredient | undefined) => !!ing && (ing.category === 'protein' || ing.category === 'veg')
 
@@ -470,10 +474,21 @@ export function computeWeek(plan: WeekPlan, cat: Catalog, people: Person[]): Wee
   const pScale = p ? clamp(targets.proteinFoods / p, 0.5, 2.5) : 1
   const vScale = v ? clamp(targets.veg / v, 0.5, 2.5) : 1
 
+  const freshScale = (ing?: Ingredient) => (ing?.category === 'protein' ? pScale : ing?.category === 'veg' && !ing.notVeg ? vScale : 1)
   const dishes: DishView[] = raw.map((d) => {
+    // Seasonings follow the dish's main ingredients, so a dish with 30% more meat gets 30% more sauce.
+    let freshG = 0
+    let scaledG = 0
+    for (const [id, g] of Object.entries(d.recipe.items)) {
+      const ing = cat.ingredients[id]
+      if (!isFresh(ing)) continue
+      freshG += g
+      scaledG += g * freshScale(ing)
+    }
+    const seasonScale = freshG ? scaledG / freshG : 1
     const items = Object.entries(d.recipe.items).map(([id, g]) => {
       const ing = cat.ingredients[id]
-      const k = ing?.category === 'protein' ? pScale : ing?.category === 'veg' && !ing.notVeg ? vScale : 1
+      const k = isFresh(ing) ? freshScale(ing) : STARCHES.has(id) ? 1 : seasonScale
       return { id, g: g * k * d.batch }
     })
     const cooked =
@@ -513,7 +528,7 @@ export function computeWeek(plan: WeekPlan, cat: Catalog, people: Person[]): Wee
       boxes.push({
         eatDay,
         person,
-        items: from.map((d) => ({ name: d.recipe.name, g: d.portion[person] })),
+        items: from.map((d) => ({ name: dishName(d.recipe), g: d.portion[person] })),
         riceG: round(ht.perPerson[person].kcal / 10),
         fruit: fruit && { name: fruit.name, g: fruit.g[person] },
       })
@@ -527,13 +542,13 @@ export function computeWeek(plan: WeekPlan, cat: Catalog, people: Person[]): Wee
     for (const it of d.items) {
       const u = usage.get(it.id) ?? { g: 0, dishes: new Set() }
       u.g += it.g
-      u.dishes.add(d.recipe.name)
+      u.dishes.add(dishName(d.recipe))
       usage.set(it.id, u)
     }
     for (const id of freshIds(d.recipe, cat)) {
       const ing = cat.ingredients[id]
       if (ing.useBy < d.cookDay) {
-        warnings.push(`${d.recipe.name} on ${DAY_NAMES[d.day]} uses ${ing.name.toLowerCase()}, which should be cooked by ${DAY_NAMES[ing.useBy]}.`)
+        warnings.push(`${dishName(d.recipe)} on ${DAY_NAMES[d.day]} uses ${ing.name.toLowerCase()}, which should be cooked by ${DAY_NAMES[ing.useBy]}.`)
       }
     }
   }
@@ -570,7 +585,7 @@ function buildShopping(usage: Map<string, { g: number; dishes: Set<string> }>, f
   const group = (id: string) => groups.find((g) => g.id === id)!
   for (const [id, u] of usage) {
     const ing = cat.ingredients[id]
-    if (!ing) continue
+    if (!ing || ing.basic) continue
     const usedIn = [...u.dishes]
     const item: ShoppingItem = { key: `ing:${id}`, name: ing.name, amount: '', usedIn }
     if (ing.category === 'pantry') {
@@ -616,9 +631,9 @@ function buildPrep(dishes: DishView[], usage: Map<string, { g: number; dishes: S
         d.store === 'freezer'
           ? `Cool it within 2 hours, split it into a dinner box and a lunch-box box, and freeze them flat, labelled "${day}".`
           : `Cool it within 2 hours, split it into a dinner box and a lunch-box box, and keep them in the fridge.`
-      cookAhead.push({ id: `ahead:${d.index}`, minutes: d.recipe.minutes, text: `${d.recipe.name} (${d.recipe.minutes} min, double batch) for ${meals}. ${keep}` })
+      cookAhead.push({ id: `ahead:${d.index}`, minutes: d.recipe.minutes, text: `${dishName(d.recipe)} (${d.recipe.minutes} min, double batch) for ${meals}. ${keep}` })
       if (d.store === 'freezer') {
-        thaw.push({ when: `${DAY_NAMES[d.day - 1]} night`, text: `Move ${day}'s cooked ${d.recipe.name.toLowerCase()} (dinner and lunch-box boxes) from the freezer to the fridge.` })
+        thaw.push({ when: `${DAY_NAMES[d.day - 1]} night`, text: `Move ${day}'s cooked ${dishName(d.recipe)} (dinner and lunch-box boxes) from the freezer to the fridge.` })
       }
       continue
     }
@@ -630,14 +645,14 @@ function buildPrep(dishes: DishView[], usage: Map<string, { g: number; dishes: S
       const id = `protein:${d.index}:${it.id}`
       const name = ing.name.toLowerCase()
       if (!ing.freezable) {
-        proteinItems.push({ id, text: `Fridge: ${g} ${name} for ${day}, ${d.recipe.name}. Keep it in the coldest spot and cook by ${DAY_NAMES[ing.useBy]}.` })
+        proteinItems.push({ id, text: `Fridge: ${g} ${name} for ${day}, ${dishName(d.recipe)}. Keep it in the coldest spot and cook by ${DAY_NAMES[ing.useBy]}.` })
       } else if (it.id === 'shrimp') {
-        proteinItems.push({ id, text: `Freezer: ${g} frozen shrimp for ${day}, ${d.recipe.name}. Keep it frozen.` })
-        thaw.push({ when: `${day}, before cooking`, text: `Thaw ${g} shrimp under cold running water for 10 minutes (${d.recipe.name}).` })
+        proteinItems.push({ id, text: `Freezer: ${g} frozen shrimp for ${day}, ${dishName(d.recipe)}. Keep it frozen.` })
+        thaw.push({ when: `${day}, before cooking`, text: `Thaw ${g} shrimp under cold running water for 10 minutes (${dishName(d.recipe)}).` })
       } else if (d.day <= 1) {
-        proteinItems.push({ id, text: `Fridge: ${g} ${name} for ${day}, ${d.recipe.name}. ${ing.storage}` })
+        proteinItems.push({ id, text: `Fridge: ${g} ${name} for ${day}, ${dishName(d.recipe)}. ${ing.storage}` })
       } else {
-        proteinItems.push({ id, text: `Freeze: ${g} ${name} for ${day}, ${d.recipe.name}. Bag it flat and label it "${day}". ${ing.storage}` })
+        proteinItems.push({ id, text: `Freeze: ${g} ${name} for ${day}, ${dishName(d.recipe)}. Bag it flat and label it "${day}". ${ing.storage}` })
         thaw.push({ when: `${DAY_NAMES[d.day - 1]} night`, text: `Move ${day}'s ${ing.name.toLowerCase()} (${g}) from the freezer to the fridge.` })
       }
     }
@@ -687,6 +702,22 @@ function buildPrep(dishes: DishView[], usage: Map<string, { g: number; dishes: S
     { id: 'batch', title: 'Batch tasks', items: batch },
   ].filter((s) => s.items.length)
   return { prep, thaw }
+}
+
+/** One amount inside a recipe step: "2 个" eggs, "15 ml" soy sauce, "8 g" sugar. */
+function stepAmount(id: string, g: number, ing?: Ingredient): string {
+  if (id === 'eggs') return `${Math.max(1, Math.round(g / 50))} 个`
+  const v = g < 3 ? Math.max(0.5, Math.round(g * 2) / 2) : g < 20 ? Math.round(g) : round(g, 5)
+  return `${v} ${ing?.ml ? 'ml' : 'g'}`
+}
+
+/** Fill `{id}` and `{id/2}` tokens in a step with this batch's amounts. */
+export function renderStep(step: string, amounts: Record<string, number>, cat: Catalog): string {
+  return step.replace(/\{([a-z_]+)(?:\/(\d+))?\}/g, (token, id: string, div?: string) => {
+    const g = amounts[id]
+    if (g === undefined) return token
+    return stepAmount(id, g / (div ? Number(div) : 1), cat.ingredients[id])
+  })
 }
 
 /** "4 eggs", "320 g" for one ingredient amount. */
