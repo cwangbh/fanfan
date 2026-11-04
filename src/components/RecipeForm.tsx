@@ -29,6 +29,7 @@ interface Props {
 export function RecipeForm({ catalog, initial, onClose }: Props) {
   const editing = !!initial?.custom
   const [name, setName] = useState(initial ? (editing ? initial.name : `${initial.name} (my version)`) : '')
+  const [zh, setZh] = useState(initial?.zh ?? '')
   const [kind, setKind] = useState<DishKind>(initial?.kind ?? 'main')
   const [cuisine, setCuisine] = useState(initial?.cuisine ?? 'Chinese')
   const [minutes, setMinutes] = useState(String(initial?.minutes ?? 20))
@@ -56,6 +57,7 @@ export function RecipeForm({ catalog, initial, onClose }: Props) {
     const recipe: Recipe = {
       id: editing ? initial!.id : newId('u', name),
       name: name.trim(),
+      ...(zh.trim() && { zh: zh.trim() }),
       kind,
       cuisine: cuisine.trim() || 'Other',
       minutes: Math.max(1, Number(minutes) || 20),
@@ -73,6 +75,10 @@ export function RecipeForm({ catalog, initial, onClose }: Props) {
         <label className="field">
           Dish name
           <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Cumin lamb" autoFocus />
+        </label>
+        <label className="field">
+          Chinese name (optional)
+          <input type="text" value={zh} onChange={(e) => setZh(e.target.value)} placeholder="例如 孜然羊肉" />
         </label>
         <div className="grid-3">
           <label className="field">

@@ -102,7 +102,10 @@ Results for the example profiles:
   The app shows "N dishes from M fresh ingredients".
 - **Variety:** the mains cover at least 4 protein families (chicken, pork, beef, seafood, eggs, tofu…), and no family is the
   main ingredient in more than 2 mains. At least 8 different vegetables, including at least one leafy green.
-- Cuisine: **mostly Chinese home-style, plus some easy Western dishes (assumption)**. The starting database has about 45 recipes.
+- Cuisine: **mostly Chinese home-style, plus some easy Western dishes**. 52 dishes (mostly Chinese, two Japanese-style rice bowls) come from
+  [HowToCook 程序员做饭指南](https://github.com/Anduin2017/HowToCook) (public domain, Unlicense), scaled to one meal for two;
+  9 Western dishes are kept from the original set. Dish names show in Chinese first, with the English name underneath.
+- Older built-in recipes are **retired**: past weeks still show them, but they are no longer planned or listed.
 - **Regenerate week** creates a new menu. **Swap** replaces one dish, and lists alternatives
   ranked by how few new ingredients they add. If a swap breaks the reuse rule, the app shows a warning.
 
@@ -132,7 +135,10 @@ Built from the current menu:
 - Each step is a checklist item that stays checked after a reload.
 
 ### R7 Recipes
-- For every dish on the menu: ingredients scaled to the batch size, cooking time, and 2–4 short steps.
+- For every dish on the menu: ingredients scaled to the batch size, cooking time, and the HowToCook steps in Chinese
+  with exact seasoning amounts. Amounts in the steps (`{soy_sauce}`, `{ginger/2}` in the data) are filled in for this
+  week's batch, so a double batch shows double the soy sauce. Seasonings scale with the dish's meat and vegetables.
+- Each HowToCook dish links to its original page. Oil, salt and sugar are treated as kitchen basics and left off the shopping list.
 - The other recipes can be browsed in a collapsed section.
 
 ### R8 My recipes (add your own dishes)
@@ -219,7 +225,7 @@ Built-in recipes and ingredients come with the app code. Only your own additions
 
 ### Project layout
     src/data/ingredients.ts   built-in ingredients: protein/100 g, cook-by day, storage tips, piece size
-    src/data/recipes.ts       built-in recipes (grams for 2 servings, steps)
+    src/data/recipes.ts       built-in recipes (grams for 2 servings, steps; HowToCook dishes with source links)
     src/lib/nutrition.ts      R1 target maths
     src/lib/planner.ts        R2–R6, R9: menu generation, scheduling, scaling, lunch boxes, shopping list, prep guide
     src/lib/sync.ts           record format, validation, last-write-wins merge, backup file (shared with the server)
@@ -271,3 +277,6 @@ Built-in recipes and ingredients come with the app code. Only your own additions
 - [ ] Export → delete local data → Import gives back the same recipes, weeks and ticks.
 - [ ] `docker compose up` on a clean machine serves the app. Data survives `docker compose down && up`.
 - [ ] Works at 375 px phone width; installable from Safari over HTTPS.
+
+## Credits
+Chinese recipes are adapted from [HowToCook 程序员做饭指南](https://github.com/Anduin2017/HowToCook) by Anduin2017 and contributors, released under the Unlicense.

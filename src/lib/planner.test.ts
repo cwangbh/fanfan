@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { RECIPES } from '../data/recipes.ts'
 import { DEFAULT_PEOPLE, dailyTargets, householdTargets } from './nutrition.ts'
 import {
   BOX_DAYS,
@@ -7,12 +8,14 @@ import {
   COOK_AHEAD_DAYS,
   cookDay,
   deadline,
+  dishName,
   freshIds,
   generatePlan,
   MIN_PROTEIN_FAMILIES,
   MIN_VEG_TYPES,
   mainProtein,
   recentRecipeIds,
+  renderStep,
   swapOptions,
   weekStartOf,
 } from './planner.ts'
@@ -79,7 +82,7 @@ describe('planner (R2, R4, R5)', () => {
         expect(main.recipe.cookAhead).toBe(true)
         expect(main.cookDay).toBe(0)
         expect(main.store).toBe(day >= 3 ? 'freezer' : 'fridge')
-        if (main.store === 'freezer') expect(view.thaw.some((t) => t.text.includes(main.recipe.name.toLowerCase()))).toBe(true)
+        if (main.store === 'freezer') expect(view.thaw.some((t) => t.text.includes(dishName(main.recipe)))).toBe(true)
       }
       expect(view.prep[0].items).toHaveLength(COOK_AHEAD_DAYS.length)
       for (const d of view.dishes) if (d.slot !== 'main' || d.day === 0 || d.day === 6) expect(d.cookDay).toBe(d.day)
@@ -157,6 +160,40 @@ describe('planner (R2, R4, R5)', () => {
     expect(tue.cookDay).toBe(2)
     expect(tue.store).toBeUndefined()
     expect(view.prep[0].items).toHaveLength(COOK_AHEAD_DAYS.length - 1)
+  })
+
+  it('never plans retired recipes, but old weeks still find them', () => {
+    expect(cat.recipes.some((r) => r.retired)).toBe(false)
+    expect(cat.byId.shrimp_eggs?.retired).toBe(true)
+    for (const seed of [1, 2, 3]) {
+      const plan = generatePlan({ catalog: cat, weekStart: '2026-11-01', seed })
+      expect(plan.slots.every((s) => !cat.byId[s.recipeId].retired)).toBe(true)
+    }
+  })
+
+  it('every step token names an ingredient of its own recipe', () => {
+    for (const r of RECIPES) {
+      for (const step of r.steps) {
+        for (const [, id] of step.matchAll(/\{([a-z_]+)(?:\/\d+)?\}/g)) expect(r.items, `${r.id}: {${id}}`).toHaveProperty(id)
+      }
+    }
+  })
+
+  it('step amounts follow the batch', () => {
+    const r = cat.byId.ribs_potato
+    const step = '加 {soy_sauce} 生抽和 {cooking_wine/2} 料酒，打 {eggs} 鸡蛋'
+    expect(renderStep(step, { soy_sauce: 7, cooking_wine: 15, eggs: 100 }, cat)).toBe('加 7 ml 生抽和 8 ml 料酒，打 2 个 鸡蛋')
+    const plan = generatePlan({ catalog: cat, weekStart: '2026-11-01', seed: 1 })
+    const idx = plan.slots.findIndex((s) => s.slot === 'main' && s.day === 1)
+    const view = computeWeek({ ...plan, slots: plan.slots.map((s, i) => (i === idx ? { ...s, recipeId: r.id } : s)) }, cat, people)
+    const dish = view.byDay[1].find((d) => d.slot === 'main')!
+    const soy = dish.items.find((it) => it.id === 'soy_sauce')!.g
+    const ratio = (id: string) => dish.items.find((it) => it.id === id)!.g / r.items[id]
+    // Double batch, and the sauce scales with the dish's ribs and potatoes (a weighted average of the two).
+    const [lo, hi] = [ratio('pork_ribs'), ratio('potato')].sort((x, y) => x - y)
+    expect(soy / r.items.soy_sauce).toBeGreaterThanOrEqual(lo)
+    expect(soy / r.items.soy_sauce).toBeLessThanOrEqual(hi)
+    expect(soy).toBeGreaterThan(r.items.soy_sauce * 1.5)
   })
 
   it('weeks start on Sunday', () => {
