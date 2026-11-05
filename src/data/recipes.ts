@@ -20,6 +20,7 @@ export interface Recipe {
 }
 
 const htc = (path: string) => `https://github.com/Anduin2017/HowToCook/blob/master/dishes/${path}.md`
+const hoc = (path: string) => `https://github.com/Gar-b-age/CookLikeHOC/blob/main/${path}.md`
 
 export const RECIPES: Recipe[] = [
   // ---------- Mains ----------
@@ -855,6 +856,335 @@ export const RECIPES: Recipe[] = [
       '胡萝卜切片焯水 1–2 分钟捞出（原版还配 50 g 西兰花）。',
       '热锅放 {oil} 油，爆香拍碎的大蒜，鸡腿皮朝下中小火煎到两面金黄，锅太干就补一点油。',
       '倒入酱汁，盖盖小火焖 5–10 分钟，酱汁浓稠起泡即可。切块和胡萝卜一起铺在饭上，淋上酱汁。',
+    ],
+  },
+  // ---------- 像老乡鸡那样做饭 CookLikeHOC (github.com/Gar-b-age/CookLikeHOC) ----------
+  // Built from the restaurant recipes in 老乡鸡's sourcing report (菜品溯源报告): amounts are scaled down to one meal for two,
+  // and the chain's ready-made sauce packs are replaced with home seasoning. Steps are written for a home kitchen.
+  // Mains
+  {
+    id: 'farmhouse_pork', zh: '农家小炒肉', name: 'Farmhouse pork with green peppers', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true, source: hoc('炒菜/农家小炒肉（鸡蛋干版本）'),
+    items: { pork_belly: 60, pork: 190, green_pepper: 240, garlic: 15, soy_sauce: 10, dark_soy: 4, oyster_sauce: 8, sugar: 2, salt: 2, oil: 25 },
+    steps: [
+      '五花肉和瘦肉分别切薄片；青椒（螺丝椒最好）斜切成段；蒜拍扁。',
+      '调味碗：{soy_sauce} 生抽、{dark_soy} 老抽、{oyster_sauce} 蚝油、{sugar} 白糖拌匀（代替老乡鸡的小炒肉调料）。',
+      '锅里放 {oil/2} 油，下五花肉中小火煸到出油、边缘微黄，下蒜炒香，再下瘦肉片炒到变色。',
+      '倒入调味碗翻炒到肉片均匀上色，盛出。',
+      '锅里放剩下的油烧热，下青椒和 {salt} 盐大火炒到表皮起皱、刚断生。',
+      '倒回肉片大火翻炒 30 秒出锅（有鸡蛋干或香干可以切片一起炒）。',
+    ],
+  },
+  {
+    id: 'hunan_beef', zh: '小炒黄牛肉', name: 'Hunan stir-fried beef with chili and celery', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true, source: hoc('炒菜/小炒黄牛肉'),
+    items: { beef: 220, celery: 100, chili: 20, garlic: 25, wood_ear: 5, soy_sauce: 12, oyster_sauce: 10, dark_soy: 3, cornstarch: 5, cooking_wine: 5, oil: 30 },
+    steps: [
+      '木耳提前用冷水泡发，撕小朵。牛肉逆纹切薄片，加 {soy_sauce/2} 生抽、{cooking_wine} 料酒、{cornstarch} 淀粉、1 勺水抓匀，再加 5 ml 油封住，腌 15 分钟。',
+      '香芹切段（也可以用青蒜），小米辣切圈，蒜拍碎。调味碗：剩下的生抽、{oyster_sauce} 蚝油、{dark_soy} 老抽（代替小炒黄牛肉汁）。',
+      '锅烧到冒烟，放 {oil} 油（有牛油可以加一小块），下蒜和 {chili} 小米辣大火爆香。',
+      '下牛肉大火快速划散，变色就好，不要久炒。',
+      '倒入调味碗、木耳和香芹，大火翻炒 1 分钟出锅。',
+    ],
+  },
+  {
+    id: 'spicy_chicken_dices', zh: '小炒鸡丁', name: 'Chili stir-fried chicken', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true, source: hoc('炒菜/小炒鸡丁'),
+    items: { chicken_thigh: 300, green_pepper: 100, chili: 15, garlic: 15, soy_sauce: 10, oyster_sauce: 5, dark_soy: 3, sichuan_pepper: 1, salt: 2, oil: 20 },
+    steps: [
+      '去骨鸡腿肉切 2 cm 小丁；青线椒和小米辣切圈；蒜拍碎。',
+      '锅烧热放 {oil} 油，下鸡丁大火煸炒到变色、表面微焦。',
+      '下蒜炒香，加 {soy_sauce} 生抽、{oyster_sauce} 蚝油、{dark_soy} 老抽和 {salt} 盐炒到鸡丁上色。',
+      '下青椒和 {chili} 小米辣大火爆炒 1 分钟。',
+      '出锅前淋一点花椒油（或用 {sichuan_pepper} 花椒在 1 勺热油里炸香后浇上），翻匀出锅。',
+    ],
+  },
+  {
+    id: 'broccoli_chicken_breast', zh: '西兰花炒鸡胸肉', name: 'Chicken breast with broccoli', kind: 'main', cuisine: 'Chinese', minutes: 20, cookAhead: true, source: hoc('炒菜/西兰花炒鸡胸肉'),
+    items: { chicken_breast: 250, broccoli: 300, carrot: 50, garlic: 10, soy_sauce: 10, oyster_sauce: 10, cornstarch: 5, cooking_wine: 5, salt: 2, oil: 20 },
+    steps: [
+      '鸡胸肉斜切薄片，加 {cooking_wine} 料酒、{salt} 盐、{cornstarch} 淀粉和 1 勺水抓匀，腌 10 分钟。西兰花切小朵，胡萝卜切片。',
+      '西兰花和胡萝卜下开水焯 1 分钟捞出。调味汁：{soy_sauce} 生抽、{oyster_sauce} 蚝油、2 勺水（代替鸡胸肉调味汁）。',
+      '锅烧热放 {oil} 油，油热后下鸡胸肉，先别动，等表面定型再轻轻翻炒到变白。',
+      '下蒜末炒香，倒入西兰花、胡萝卜和调味汁，大火翻炒 1 分钟出锅。',
+    ],
+  },
+  {
+    id: 'carrot_pork', zh: '胡萝卜炒肉丝', name: 'Shredded pork with carrots', kind: 'main', cuisine: 'Chinese', minutes: 15, cookAhead: true, source: hoc('炒菜/胡萝卜炒肉丝'),
+    items: { pork: 200, carrot: 300, duojiao: 8, garlic: 12, scallion: 10, soy_sauce: 5, dark_soy: 2, cornstarch: 3, salt: 3, oil: 25 },
+    steps: [
+      '猪肉（后腿肉或里脊）切丝，加 {soy_sauce} 生抽和 {cornstarch} 淀粉抓匀。胡萝卜切细丝，蒜切末，葱切段。',
+      '锅烧热放 {oil} 油，下肉丝炒散到变色。',
+      '下蒜末和 {duojiao} 剁椒炒出香味。',
+      '下胡萝卜丝、{salt} 盐和 {dark_soy} 老抽大火炒 2–3 分钟到胡萝卜变软（有鸡精加 2 g）。',
+      '撒葱段翻匀出锅。',
+    ],
+  },
+  {
+    id: 'edamame_chicken', zh: '毛豆烧鸡', name: 'Braised chicken with edamame', kind: 'main', cuisine: 'Chinese', minutes: 35, cookAhead: true, source: hoc('炒菜/经典毛豆烧鸡'),
+    items: { chicken_thigh: 350, edamame: 150, ginger: 12, garlic: 12, duojiao: 10, soy_sauce: 10, dark_soy: 5, oyster_sauce: 10, sugar: 3, scallion: 10, salt: 2, oil: 20 },
+    steps: [
+      '鸡腿（带骨更香）剁成小块，洗净后用厨房纸吸干。姜切片，蒜拍扁，葱切段。',
+      '锅烧热放 {oil} 油，下鸡块中大火煸炒到表皮泛黄、出油。',
+      '下姜片、蒜和 {duojiao} 剁椒炒香，加 {soy_sauce} 生抽、{dark_soy} 老抽、{oyster_sauce} 蚝油和 {sugar} 白糖炒到鸡块上色（代替毛豆烧鸡料）。',
+      '加开水刚好没过鸡块，烧开后盖盖小火煮 15 分钟。',
+      '下 {edamame} 毛豆米再煮 3–5 分钟，加 {salt} 盐，开大火收到汤汁浓稠，撒葱段翻匀出锅。',
+    ],
+  },
+  {
+    id: 'chestnut_chicken', zh: '板栗烧鸡', name: 'Braised chicken with chestnuts', kind: 'main', cuisine: 'Chinese', minutes: 45, cookAhead: true, source: hoc('炖菜/板栗烧鸡'),
+    items: { chicken_thigh: 350, chestnuts: 150, ginger: 10, garlic: 10, chili: 5, doubanjiang: 10, cooking_wine: 10, soy_sauce: 10, dark_soy: 5, oyster_sauce: 5, sugar: 3, oil: 20 },
+    steps: [
+      '鸡腿剁小块，洗净沥干。板栗仁下开水煮 5 分钟捞出。姜切片，蒜拍扁，小米辣切段。',
+      '锅烧干水分，放 {oil} 油烧热，下鸡块大火翻炒到鸡皮收缩、出油。',
+      '下姜、蒜和小米辣炒香，再下 {doubanjiang} 豆瓣酱炒出红油。',
+      '沿锅边淋 {cooking_wine} 料酒，加 {soy_sauce} 生抽、{dark_soy} 老抽、{oyster_sauce} 蚝油和 {sugar} 白糖炒到鸡块上色（这几样代替板栗烧鸡酱料）。',
+      '加开水没过鸡块，倒入板栗，烧开后盖盖小火炖 20 分钟。',
+      '开盖大火收到汤汁浓稠出锅。',
+    ],
+  },
+  {
+    id: 'chicken_mushroom_stew', zh: '小鸡炖蘑菇', name: 'Chicken stewed with mushrooms', kind: 'main', cuisine: 'Chinese', minutes: 45, cookAhead: true, source: hoc('炖菜/小鸡炖蘑菇'),
+    items: { chicken_thigh: 350, mushroom: 200, ginger: 10, scallion: 10, star_anise: 1, cooking_wine: 10, soy_sauce: 15, dark_soy: 5, oyster_sauce: 5, sugar: 3, salt: 2, oil: 15 },
+    steps: [
+      '鸡腿剁块，冷水下锅加姜片和 {cooking_wine/2} 料酒焯水，煮开后捞出洗净沥干。蘑菇（原版是滑子菇，香菇、榛蘑都行）洗净切块。',
+      '锅里放 {oil} 油烧热，下鸡块煸炒到表面泛黄出油。',
+      '下剩下的姜片、葱段和 {star_anise} 八角炒香，淋剩下的料酒，加 {soy_sauce} 生抽、{dark_soy} 老抽、{oyster_sauce} 蚝油和 {sugar} 白糖炒 1 分钟上色。',
+      '加约 300 ml 开水，烧开后盖盖小火炖 20 分钟。',
+      '下蘑菇再炖 5–10 分钟，加 {salt} 盐，大火收到汤汁浓稠出锅。',
+    ],
+  },
+  {
+    id: 'celery_shrimp', zh: '西芹炒虾仁', name: 'Shrimp with celery and carrot', kind: 'main', cuisine: 'Chinese', minutes: 15, source: hoc('炒菜/西芹炒虾仁'),
+    items: { shrimp: 220, celery: 250, carrot: 60, garlic: 5, salt: 3, sugar: 2, cornstarch: 3, oil: 12 },
+    steps: [
+      '虾仁完全解冻后冲洗、吸干。西芹去筋斜切段，胡萝卜切片，蒜切片。',
+      '调味汁：{salt} 盐、{sugar} 白糖、{cornstarch} 淀粉和 2 勺水拌匀（有鸡精加 2 g）。',
+      '烧一锅开水，下西芹、胡萝卜和虾仁焯 1 分钟到虾变色，捞出沥干。',
+      '锅里放 {oil} 油，下蒜片炒香，倒入焯好的材料大火翻炒 30 秒。',
+      '倒入调味汁翻炒到汤汁透明、包住食材，出锅。',
+    ],
+  },
+  {
+    id: 'garlic_vermicelli_shrimp', zh: '蒜蓉粉丝虾', name: 'Steamed garlic shrimp on glass noodles', kind: 'main', cuisine: 'Chinese', minutes: 25, source: hoc('蒸菜/蒜蓉粉丝虾'),
+    items: { shrimp: 250, glass_noodles: 50, garlic: 30, chili: 5, scallion: 15, soy_sauce: 20, sugar: 2, oil: 25 },
+    steps: [
+      '粉丝用温水泡软，剪成两段铺在盘底。虾（带壳开背最好看，虾仁也行）去虾线，摆在粉丝上。',
+      '蒜剁成蒜蓉，分成两半。锅里放 {oil/2} 油，小火把一半蒜蓉炸到金黄，关火倒入另一半生蒜蓉拌匀，就是金银蒜蓉酱。',
+      '把蒜蓉酱铺在虾上，撒切碎的 {chili} 小米辣（或红椒丁）。',
+      '水开后上锅大火蒸 6–8 分钟，虾完全变色即可。',
+      '调味汁：{soy_sauce} 生抽、{sugar} 白糖和 1 勺水，淋在虾和粉丝上。撒葱花，再浇上剩下的烧到冒烟的热油。',
+    ],
+  },
+  {
+    id: 'shrimp_steamed_egg', zh: '虾仁蒸鸡蛋', name: 'Silky steamed eggs with shrimp', kind: 'main', cuisine: 'Chinese', minutes: 20, source: hoc('蒸菜/虾仁蒸鸡蛋'),
+    items: { eggs: 200, shrimp: 100, scallion: 5, salt: 2, soy_sauce: 8, sesame_oil: 3 },
+    steps: [
+      '鸡蛋打散，加 {salt} 盐和 1.5 倍蛋液量的温水（约 300 ml）顺一个方向搅匀，过筛撇掉泡沫，倒进浅盘或碗。',
+      '虾仁解冻吸干，用一点盐和淀粉抓一下。',
+      '盖上盘子或保鲜膜（扎几个小孔），水开后中小火蒸 8 分钟，到蛋液表面刚凝固。',
+      '把虾仁摆在蛋面上，再蒸 3–4 分钟，关火焖 1 分钟。',
+      '淋 {soy_sauce} 生抽（蒸鱼豉油更好）和 {sesame_oil} 香油，撒葱花。',
+    ],
+  },
+  {
+    id: 'scallion_oil_chicken', zh: '葱油鸡', name: 'Steamed chicken with scallion oil', kind: 'main', cuisine: 'Chinese', minutes: 45, source: hoc('蒸菜/葱油鸡（鸡排腿版）'),
+    items: { chicken_thigh: 450, scallion: 40, ginger: 10, salt: 5, soy_sauce: 30, sugar: 3, oil: 20 },
+    steps: [
+      '带骨鸡腿洗净吸干，用 {salt} 盐、几段葱和姜片抹匀，腌 20 分钟。',
+      '水开后上锅大火蒸 25–30 分钟，筷子扎最厚处没有血水即可。蒸好后稍放凉，剁成 2 cm 宽的块，码盘。',
+      '做葱油：剩下的葱切葱花，留一小把，其余放碗里；{oil} 油烧到冒烟，浇在葱花上。',
+      '调味汁：{soy_sauce} 生抽（原版用味极鲜）、{sugar} 白糖、1 勺温水和一半葱油拌匀。',
+      '鸡块回锅蒸 3 分钟热透，淋上调味汁和剩下的葱油，撒葱花。',
+    ],
+  },
+  {
+    id: 'rice_powder_pork', zh: '粉蒸肉', name: 'Rice-powder steamed pork', kind: 'main', cuisine: 'Chinese', minutes: 70, cookAhead: true, source: hoc('蒸菜/粉蒸肉'),
+    items: { pork_belly: 250, rice_powder: 80, potato: 200, doubanjiang: 8, soy_sauce: 8, dark_soy: 3, cooking_wine: 5, sugar: 3, ginger: 5, scallion: 5, oil: 10 },
+    steps: [
+      '五花肉（或前夹肉）切 0.5 cm 厚的片，加 {doubanjiang} 豆瓣酱、{soy_sauce} 生抽、{dark_soy} 老抽、{cooking_wine} 料酒、{sugar} 白糖和姜末抓匀，腌 20 分钟（代替蒸肉酱）。',
+      '{rice_powder} 蒸肉米粉加约 50 ml 水拌到湿润，倒进肉里，让每片肉都均匀裹上米粉，最后拌入 {oil} 油。',
+      '土豆去皮切滚刀块铺在碗底（原版用黄心红薯，有就换成红薯）。',
+      '把米粉肉一片片铺在土豆上，剩下的米粉也撒上。',
+      '水开后上锅大火转中火蒸 50–60 分钟，到肉软糯、土豆一夹就烂。撒葱花出锅。',
+    ],
+  },
+  {
+    id: 'meicai_pork', zh: '梅菜扣肉', name: 'Pork belly steamed with preserved mustard greens', kind: 'main', cuisine: 'Chinese', minutes: 150, cookAhead: true, source: hoc('蒸菜/梅菜扣肉'),
+    items: { pork_belly: 400, meigancai: 40, dark_soy: 15, soy_sauce: 10, oyster_sauce: 15, sugar: 10, cooking_wine: 10, ginger: 10, scallion: 10, star_anise: 1, oil: 20 },
+    steps: [
+      '{meigancai} 梅干菜用温水泡 30 分钟，反复搓洗几遍去沙，挤干切碎。',
+      '整块带皮五花肉冷水下锅，加姜片、葱段和 {cooking_wine} 料酒，煮 20 分钟到筷子能扎透，捞出擦干，趁热在肉皮上抹一层 {dark_soy/2} 老抽。',
+      '锅里放 {oil} 油，肉皮朝下中火煎到起泡、呈虎皮状（盖锅盖防溅油），捞出泡冷水 10 分钟让肉皮起皱。',
+      '肉切 0.5 cm 厚的大片，加剩下的老抽、{soy_sauce} 生抽、{oyster_sauce} 蚝油和 {sugar/2} 白糖抓匀，皮朝下整齐码进碗里。',
+      '锅里放少许油，下梅干菜、{star_anise} 八角和剩下的白糖炒干炒香，倒入码肉剩下的酱汁拌匀，压在肉上。',
+      '水开后上锅中火蒸 90 分钟（原版 60 分钟，但他们的扣肉已经卤过）。扣肉碗上盖一个盘子，倒扣出来上桌。',
+    ],
+  },
+  {
+    id: 'napa_tofu_stew', zh: '白菜炖豆腐', name: 'Napa cabbage braised with tofu', kind: 'main', cuisine: 'Chinese', minutes: 25, cookAhead: true, source: hoc('炖菜/白菜炖豆腐'),
+    items: { tofu: 400, napa: 300, garlic: 10, ginger: 5, scallion: 5, soy_sauce: 12, oyster_sauce: 8, white_pepper: 1, salt: 2, oil: 15 },
+    steps: [
+      '豆腐切 2 cm 方块，白菜切段，帮和叶分开。蒜拍扁，姜切片。',
+      '锅里放 {oil} 油（加一小勺猪油更香），下蒜和姜片炒香，再下白菜帮炒软。',
+      '加约 300 ml 水、{soy_sauce} 生抽、{oyster_sauce} 蚝油和 {salt} 盐（代替炒菜基料），轻轻放入豆腐，烧开后小火炖 8 分钟。',
+      '下白菜叶，烧开后小火再炖 3–5 分钟到入味。',
+      '撒 {white_pepper} 白胡椒粉和葱花出锅。',
+    ],
+  },
+  {
+    id: 'three_delicacy_tofu', zh: '砂锅三鲜豆腐', name: 'Clay-pot tofu with shrimp and mushrooms', kind: 'main', cuisine: 'Chinese', minutes: 25, source: hoc('砂锅菜/砂锅三鲜豆腐'),
+    items: { tofu: 350, shrimp: 100, mushroom: 100, wood_ear: 4, ginger: 5, scallion: 5, oyster_sauce: 5, salt: 3, white_pepper: 1, sesame_oil: 2, oil: 10 },
+    steps: [
+      '木耳提前泡发撕小朵；豆腐切块；蘑菇（原版是白玉菇）切小块；虾焯水到变色捞出。',
+      '锅里放 {oil} 油，下姜片爆香，加约 400 ml 开水、{oyster_sauce} 蚝油和 {salt} 盐（代替三鲜豆腐汤料）。',
+      '烧开后下豆腐，小火煮 5 分钟，再下木耳和蘑菇煮 3 分钟。',
+      '倒进砂锅（没有就用原锅），把虾摆在豆腐上，烧开后煮 1 分钟。',
+      '撒 {white_pepper} 白胡椒粉、葱花，淋几滴 {sesame_oil} 香油。',
+    ],
+  },
+
+  // Vegetable dishes
+  {
+    id: 'cabbage_egg', zh: '包菜炒鸡蛋', name: 'Cabbage stir-fried with egg', kind: 'veg', cuisine: 'Chinese', minutes: 12, source: hoc('炒菜/包菜炒鸡蛋'),
+    items: { cabbage: 300, carrot: 50, eggs: 100, garlic: 12, soy_sauce: 12, salt: 3, oil: 25 },
+    steps: [
+      '包菜切丝，胡萝卜切丝，蒜拍碎，鸡蛋打散。',
+      '锅里放 {oil/2} 油，倒入蛋液炒成大块蛋片，盛出。',
+      '放剩下的油（加一勺猪油更香），下蒜炒香。',
+      '下包菜和胡萝卜丝，加 {salt} 盐和 {soy_sauce} 生抽大火翻炒 2 分钟（有鸡精加 2 g）。',
+      '倒回蛋片翻炒 1 分钟出锅。',
+    ],
+  },
+  {
+    id: 'green_pepper_egg', zh: '青椒炒鸡蛋', name: 'Green peppers with scrambled egg', kind: 'veg', cuisine: 'Chinese', minutes: 10, source: hoc('炒菜/青椒炒鸡蛋'),
+    items: { green_pepper: 250, eggs: 100, garlic: 10, salt: 3, oil: 25 },
+    steps: [
+      '青椒去籽切块或切丝，蒜切片，鸡蛋打散加一小撮盐。',
+      '锅里放 {oil/2} 油，倒入蛋液炒成蛋片，盛出。',
+      '放剩下的油，下青椒、蒜片和 {salt} 盐大火爆炒到青椒断生、表皮微皱。',
+      '倒回蛋片翻炒均匀出锅。',
+    ],
+  },
+  {
+    id: 'hot_sour_cabbage', zh: '酸辣包菜', name: 'Hot and sour shredded cabbage', kind: 'veg', cuisine: 'Chinese', minutes: 10, source: hoc('炒菜/酸辣包菜'),
+    items: { cabbage: 400, duojiao: 10, garlic: 12, vinegar: 8, sugar: 2, salt: 4, oil: 20 },
+    steps: [
+      '包菜切丝或手撕成片，洗净沥干；蒜拍碎。',
+      '锅里放 {oil} 油，下蒜和 {duojiao} 剁椒炒香。',
+      '下包菜、{salt} 盐和 {sugar} 白糖，大火翻炒 3 分钟到包菜变软。',
+      '沿锅边淋 {vinegar} 陈醋，翻匀出锅。',
+    ],
+  },
+  {
+    id: 'hot_sour_napa', zh: '酸辣大白菜', name: 'Hot and sour napa cabbage', kind: 'veg', cuisine: 'Chinese', minutes: 10, source: hoc('炒菜/酸辣大白菜'),
+    items: { napa: 450, duojiao: 8, garlic: 12, soy_sauce: 10, vinegar: 5, salt: 3, oil: 20 },
+    steps: [
+      '大白菜斜刀片成片，帮和叶分开；蒜拍碎。',
+      '锅里放 {oil} 油（加一勺猪油更香），下蒜和 {duojiao} 剁椒炒香。',
+      '先下白菜帮大火炒 1 分钟，再下白菜叶，加 {soy_sauce} 生抽和 {salt} 盐炒 2–3 分钟。',
+      '沿锅边淋 {vinegar} 陈醋，翻匀出锅。',
+    ],
+  },
+  {
+    id: 'garlic_mash_spinach', zh: '蒜泥菠菜', name: 'Spinach with mashed garlic', kind: 'veg', cuisine: 'Chinese', minutes: 8, source: hoc('炒菜/蒜泥菠菜'),
+    items: { spinach: 350, garlic: 15, salt: 3, oil: 15 },
+    steps: [
+      '菠菜洗净切段，蒜捣成蒜泥。',
+      '烧一锅开水，下菠菜烫 30 秒捞出，沥干水分（菠菜焯过不涩）。',
+      '锅里放 {oil} 油，下蒜泥小火炒香。',
+      '倒入菠菜和 {salt} 盐，大火快速翻匀出锅。',
+    ],
+  },
+  {
+    id: 'mushroom_bok_choy', zh: '香菇青菜', name: 'Bok choy with shiitake', kind: 'veg', cuisine: 'Chinese', minutes: 8, source: hoc('炒菜/香菇青菜'),
+    items: { bok_choy: 300, mushroom: 60, salt: 3, sugar: 1, oil: 15 },
+    steps: [
+      '青菜洗净，大的对半切开；香菇切片。',
+      '锅烧热放 {oil} 油（加一勺猪油更香），下香菇片炒软。',
+      '下青菜、{salt} 盐和 {sugar} 白糖，大火爆炒 2 分钟到青菜断生出锅。',
+    ],
+  },
+  {
+    id: 'scallion_oil_greens', zh: '葱油菜心', name: 'Blanched greens with scallion soy dressing', kind: 'veg', cuisine: 'Chinese', minutes: 8, source: hoc('烫菜/葱油菜心'),
+    items: { greens: 300, scallion: 15, soy_sauce: 20, sugar: 3, oil: 15 },
+    steps: [
+      '菜心（青菜、生菜都行）洗净。葱切丝。',
+      '豉油汁：{soy_sauce} 生抽、{sugar} 白糖和 1 勺水拌匀。',
+      '烧一锅开水，加几滴油和一小撮盐，下菜心烫 1 分钟（生菜 10 秒），捞出沥干码盘。',
+      '把豉油汁淋在菜上，铺上葱丝；{oil} 油烧到冒烟，浇在葱丝上。',
+    ],
+  },
+  {
+    id: 'carrot_wood_ear', zh: '胡萝卜炒木耳', name: 'Carrots with wood ear mushrooms', kind: 'veg', cuisine: 'Chinese', minutes: 12, source: hoc('炒菜/胡萝卜炒木耳'),
+    items: { carrot: 250, wood_ear: 5, garlic: 15, soy_sauce: 10, salt: 1, oil: 15 },
+    steps: [
+      '木耳提前用冷水泡发，撕小朵；胡萝卜切片；蒜切末（原版用青蒜，有的话切段）。',
+      '锅里放 {oil} 油烧热，下胡萝卜片和木耳，加 {soy_sauce} 生抽和 {salt} 盐大火爆炒 2–3 分钟到胡萝卜熟透。',
+      '下蒜末翻炒均匀出锅。',
+    ],
+  },
+  {
+    id: 'celery_dried_tofu', zh: '芹菜炒香干', name: 'Celery with pressed tofu', kind: 'veg', cuisine: 'Chinese', minutes: 10, source: hoc('炒菜/芹菜炒香干'),
+    items: { celery: 250, dried_tofu: 150, bell_pepper: 30, salt: 3, oil: 20 },
+    steps: [
+      '芹菜去叶切 3 cm 段，香干切条，红椒切丝。',
+      '锅里放 {oil} 油烧热，下芹菜、香干、红椒和 {salt} 盐（有鸡精加 2 g）。',
+      '大火爆炒 3 分钟出锅。',
+    ],
+  },
+  {
+    id: 'celery_peanuts', zh: '西芹花生米', name: 'Celery and peanut salad', kind: 'veg', cuisine: 'Chinese', minutes: 10, source: hoc('凉拌/西芹花生米'),
+    items: { celery: 250, peanuts: 80, bell_pepper: 30, salt: 2, sesame_oil: 8 },
+    steps: [
+      '西芹去筋切小段或小丁，红椒切丁。用生花生的话先加盐煮 10 分钟。',
+      '烧一锅开水，下西芹和红椒烫 1 分钟，捞出用凉开水冲凉，沥干。',
+      '加花生米、{salt} 盐和 {sesame_oil} 香油（有鸡精加 2 g），拌匀即可。',
+    ],
+  },
+  {
+    id: 'edamame_pepper', zh: '青椒毛豆米', name: 'Edamame with green pepper', kind: 'veg', cuisine: 'Chinese', minutes: 10, source: hoc('炒菜/青椒毛豆米'),
+    items: { edamame: 250, green_pepper: 80, garlic: 10, salt: 3, sugar: 2, oil: 20 },
+    steps: [
+      '青椒切丝，蒜拍碎。毛豆米不用解冻，冲一下水。',
+      '锅里放 {oil} 油烧热，下蒜炒香。',
+      '下毛豆米翻炒 1 分钟，加 {salt} 盐和 {sugar} 白糖，加 2 勺水再炒 2 分钟到毛豆熟透。',
+      '下青椒丝炒 30 秒出锅。',
+    ],
+  },
+
+  // Soups
+  {
+    id: 'mushroom_chicken_soup', zh: '菌菇鸡汤', name: 'Chicken and mushroom soup', kind: 'soup', cuisine: 'Chinese', minutes: 90, source: hoc('汤/菌菇鸡汤'),
+    items: { chicken_thigh: 250, mushroom: 120, ginger: 8, cooking_wine: 8, rock_sugar: 3, salt: 4 },
+    steps: [
+      '鸡块（老母鸡最好，鸡腿也行）冷水下锅，水开后立刻关火，捞出用冷水冲净。',
+      '菌菇（原版是鹿茸菇、虫草花、姬松茸，香菇、蟹味菇都行）洗净。',
+      '砂锅里放鸡块、姜片、{cooking_wine} 料酒（花雕更好）、{rock_sugar} 冰糖和约 1 L 水，大火烧开撇去浮沫。',
+      '转小火炖 60 分钟，下菌菇再炖 20 分钟。',
+      '加 {salt} 盐调味，撇掉浮油出锅。',
+    ],
+  },
+
+  // Saturday one-pot
+  {
+    id: 'shiitake_chicken_noodles', zh: '香菇鸡汤面', name: 'Chicken soup noodles with shiitake', kind: 'onepot', cuisine: 'Chinese', minutes: 75, source: hoc('主食/香菇鸡汤面'),
+    items: { chicken_thigh: 300, dried_shiitake: 8, noodles: 220, napa: 150, eggs: 100, ginger: 8, scallion: 8, salt: 5, oil: 5 },
+    steps: [
+      '干香菇用温水泡发（泡香菇的水留着）。鸡腿剁块，用一小撮盐抹匀腌 20 分钟，焯水后洗净。',
+      '鸡块、姜片、香菇和泡香菇的水一起放进锅里，加水到约 1.5 L，烧开撇沫，小火炖 60 分钟，加 {salt} 盐调味。',
+      '鸡蛋打散，平底锅抹 {oil} 油摊成薄蛋皮，切丝。',
+      '另烧一锅水煮 {noodles} 面条约 4 分钟，最后 30 秒下白菜叶（原版是青菜）一起烫熟，捞进碗里。',
+      '浇上鸡汤，摆上鸡块、香菇、白菜和蛋皮丝，撒葱花。',
+    ],
+  },
+  {
+    id: 'spicy_beef_noodles', zh: '香辣牛肉面', name: 'Spicy braised beef noodle soup', kind: 'onepot', cuisine: 'Chinese', minutes: 120, source: hoc('主食/香辣牛肉面'),
+    items: { beef: 300, noodles: 250, napa: 150, ginger: 10, scallion: 10, garlic: 10, doubanjiang: 15, dried_chili: 4, sichuan_pepper: 2, star_anise: 2, spices: 2, cooking_wine: 15, soy_sauce: 15, dark_soy: 8, rock_sugar: 8, salt: 3, oil: 20 },
+    steps: [
+      '牛肉（牛腩或牛腱）切 3 cm 块，冷水下锅加 {cooking_wine/2} 料酒焯水，煮开后捞出洗净。',
+      '锅里放 {oil} 油，下姜片、蒜、葱段、{star_anise} 八角、{spices} 桂皮香叶、{sichuan_pepper} 花椒和 {dried_chili} 干辣椒小火炒香，再下 {doubanjiang} 豆瓣酱炒出红油。',
+      '下牛肉翻炒，淋剩下的料酒，加 {soy_sauce} 生抽、{dark_soy} 老抽和 {rock_sugar} 冰糖炒到上色。',
+      '加开水没过牛肉 3 cm 以上，烧开后小火炖 90 分钟到牛肉软烂，加 {salt} 盐调味（汤要多留一些做面汤）。',
+      '另烧一锅水煮 {noodles} 面条 3–4 分钟，最后 1 分钟下白菜（原版是青菜）烫熟，捞进碗里。',
+      '浇上牛肉和汤，撒葱花（有青蒜、香菜更好）。',
     ],
   },
 ]

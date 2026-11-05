@@ -104,7 +104,10 @@ Results for the example profiles:
   main ingredient in more than 2 mains. At least 8 different vegetables, including at least one leafy green.
 - Cuisine: **mostly Chinese home-style, plus some easy Western dishes**. 52 dishes (mostly Chinese, two Japanese-style rice bowls) come from
   [HowToCook 程序员做饭指南](https://github.com/Anduin2017/HowToCook) (public domain, Unlicense), scaled to one meal for two;
-  9 Western dishes are kept from the original set. Dish names show in Chinese first, with the English name underneath.
+  30 more Chinese dishes come from [CookLikeHOC 像老乡鸡那样做饭](https://github.com/Gar-b-age/CookLikeHOC), the restaurant recipes
+  from 老乡鸡's sourcing report, cut down from restaurant batches to one meal for two, with the chain's ready-made sauce packs
+  replaced by home seasoning; 9 Western dishes are kept from the original set. Dish names show in Chinese first, with the
+  English name underneath.
 - Older built-in recipes are **retired**: past weeks still show them, but they are no longer planned or listed.
 - **Regenerate week** creates a new menu. **Swap** replaces one dish, and lists alternatives
   ranked by how few new ingredients they add. If a swap breaks the reuse rule, the app shows a warning.
@@ -135,10 +138,10 @@ Built from the current menu:
 - Each step is a checklist item that stays checked after a reload.
 
 ### R7 Recipes
-- For every dish on the menu: ingredients scaled to the batch size, cooking time, and the HowToCook steps in Chinese
+- For every dish on the menu: ingredients scaled to the batch size, cooking time, and the steps in Chinese
   with exact seasoning amounts. Amounts in the steps (`{soy_sauce}`, `{ginger/2}` in the data) are filled in for this
   week's batch, so a double batch shows double the soy sauce. Seasonings scale with the dish's meat and vegetables.
-- Each HowToCook dish links to its original page. Oil, salt and sugar are treated as kitchen basics and left off the shopping list.
+- Each HowToCook and CookLikeHOC dish links to its original page. Oil, salt and sugar are treated as kitchen basics and left off the shopping list.
 - The other recipes can be browsed in a collapsed section.
 
 ### R8 My recipes (add your own dishes)
@@ -225,7 +228,7 @@ Built-in recipes and ingredients come with the app code. Only your own additions
 
 ### Project layout
     src/data/ingredients.ts   built-in ingredients: protein/100 g, cook-by day, storage tips, piece size
-    src/data/recipes.ts       built-in recipes (grams for 2 servings, steps; HowToCook dishes with source links)
+    src/data/recipes.ts       built-in recipes (grams for 2 servings, steps; HowToCook and CookLikeHOC dishes with source links)
     src/lib/nutrition.ts      R1 target maths
     src/lib/planner.ts        R2–R6, R9: menu generation, scheduling, scaling, lunch boxes, shopping list, prep guide
     src/lib/sync.ts           record format, validation, last-write-wins merge, backup file (shared with the server)
@@ -280,3 +283,6 @@ Built-in recipes and ingredients come with the app code. Only your own additions
 
 ## Credits
 Chinese recipes are adapted from [HowToCook 程序员做饭指南](https://github.com/Anduin2017/HowToCook) by Anduin2017 and contributors, released under the Unlicense.
+More Chinese recipes are based on [CookLikeHOC 像老乡鸡那样做饭](https://github.com/Gar-b-age/CookLikeHOC) by Gar-b-age and contributors,
+which collects the recipes 老乡鸡 published in its 菜品溯源报告. That repository has no license, so only the dish list, ingredients and
+proportions are used here; the steps are written from scratch for a home kitchen. This project is not affiliated with 老乡鸡.
